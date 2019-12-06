@@ -1,12 +1,21 @@
 {
   "name": "markdown-annotations-svelte",
   "version": "0.1.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "start": "sirv public"
   },
-  "keywords": [],
-  "author": "Justin Makeig <jmpublic+github@makeig.com> (https://github.com/jmakeig)",
-  "license": "Apache-2.0"
+  "devDependencies": {
+    "rollup": "^1.27.8",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-livereload": "^1.0.4",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-svelte": "^5.1.1",
+    "rollup-plugin-terser": "^5.1.2",
+    "svelte": "^3.16.0"
+  },
+  "dependencies": {
+    "sirv-cli": "^0.4.5"
+  }
 }
