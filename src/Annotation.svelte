@@ -1,7 +1,7 @@
 <script>
 	export let data;
 
-	import dateLocalizer from './i18n.js';
+	import { dateLocalizer } from './i18n.js';
 
 	function formatDate(string) {
 		return dateLocalizer.format(new Date(string));
@@ -10,8 +10,9 @@
 
 <style>
 	section {
-		border: solid 0.5px #ccc;
-		padding: 0.5em;
+		padding: 0.75em;
+		background: #efefef;
+		border-radius: 0.5em;
 	}
 </style>
 
