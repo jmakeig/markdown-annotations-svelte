@@ -1,10 +1,18 @@
 <script>
 	export let data;
 
-	import { dateLocalizer } from './i18n.js';
+	import { dateTimeLocalizer } from './i18n.js';
 
 	function formatDate(string) {
-		return dateLocalizer.format(new Date(string));
+		if (undefined === string || null === string) {
+			throw new TypeError(`${String(string)} is not a Date`);
+		}
+		const date = new Date(string);
+		// https://stackoverflow.com/a/1353711/563324
+		if (!isNaN(date)) {
+			return dateTimeLocalizer.format(date);
+		}
+		throw new TypeError(`${string} is not a Date`);
 	}
 </script>
 
