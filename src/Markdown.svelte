@@ -1,9 +1,12 @@
 <script>
-	import { onMount } from 'svelte';
-	export let rawText;
+	import { onMount, createEventDispatcher } from 'svelte';
+	export let text;
+
+	// const dispatch = createEventDispatcher();
 
 	function handleSelectionChange(event) {
 		console.log(document.getSelection());
+		// dispatch('selection', { selection: 'asdf' });
 	}
 
 	onMount(() => {
@@ -31,15 +34,14 @@
 	}
 </style>
 
-<svelte:head>
-	<title>Markdown Annotations ({Math.random()})</title>
-</svelte:head>
-
 <table>
-	{#each rawText.split('\n') as line, index}
+	{#each text.split('\n') as line, index}
 		<tr>
 			<td data-linenumber={index + 1} />
 			<td>{line}</td>
 		</tr>
 	{/each}
 </table>
+<svelte:head>
+	<title>Markdown Annotations ({Math.random()})</title>
+</svelte:head>
