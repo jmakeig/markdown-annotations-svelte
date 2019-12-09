@@ -20,18 +20,21 @@
 		text-align: left;
 		vertical-align: top;
 	}
-	td[data-linenumber] {
+	tr[data-line] td:first-child {
 		width: 1em;
 	}
-	td[data-linenumber]:before {
-		content: attr(data-lineNumber) '.';
+	tr[data-line] td:first-child:before {
+		/* Put the line numbers in a pseudo element so they cannot be selected. */
+		content: attr(data-line) '.';
+		user-select: none;
 	}
 </style>
 
 <table>
 	{#each text.split('\n') as line, index}
-		<tr>
-			<td data-linenumber={index + 1} />
+		<tr class="line" data-line={index + 1}>
+			<!-- It’s not possible to get the attribute value of a parent element in CSS, so this has to be repeated here. -->
+			<td data-line={index + 1} />
 			<td>{line}</td>
 		</tr>
 	{/each}
