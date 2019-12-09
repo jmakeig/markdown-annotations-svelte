@@ -1,6 +1,7 @@
 <script>
 	import Markdown from './Markdown.svelte';
 	import Annotations from './Annotations.svelte';
+	import Selection from './Selection.svelte';
 
 	const dummy2 = `ASDF
 
@@ -35,11 +36,19 @@ Humblebrag pok pok tacos hella hammock cold-pressed skateboard slow-carb. Fixie 
 			user: 'jmakeig',
 			timestamp: new Date().toISOString(),
 			comment: 'Scenester kitsch narwhal messenger bag hexagon blue',
+			range: {
+				start: { line: 2, column: 15 },
+				end: { line: 2, column: 55 },
+			},
 		},
 		{
 			user: 'dsthubbins',
 			timestamp: new Date().toISOString(),
 			comment: `Master cleanse authentic affogato tumblr literally, twee poutine 3 wolf moon. Typewriter scenester street art meh jianbing. Shoreditch coloring book microdosing listicle wayfarers wolf letterpress. Art party butcher humblebrag lumbersexual master cleanse green juice. Lyft echo park leggings messenger bag vice.`,
+			range: {
+				start: { line: 12, column: 77 },
+				end: { line: 12, column: 90 },
+			},
 		},
 	];
 </script>
@@ -75,7 +84,9 @@ Humblebrag pok pok tacos hella hammock cold-pressed skateboard slow-carb. Fixie 
 </header>
 <main>
 	<section id="Markdown">
-		<Markdown text={dummy} />
+		<Selection on:selectionchange={event => console.log(event.detail)}>
+			<Markdown text={dummy} {annotations} />
+		</Selection>
 	</section>
 	<section id="Annotations">
 		<Annotations items={annotations} />

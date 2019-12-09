@@ -1,18 +1,12 @@
 <script>
-	import { onMount, createEventDispatcher } from 'svelte';
+	import { afterUpdate, createEventDispatcher } from 'svelte';
 	export let text;
+	export let annotations = [];
 
 	// const dispatch = createEventDispatcher();
 
-	function handleSelectionChange(event) {
-		console.log(document.getSelection());
-		// dispatch('selection', { selection: 'asdf' });
-	}
-
-	onMount(() => {
-		document.addEventListener('selectionchange', handleSelectionChange);
-		return () =>
-			document.removeEventListener('selectionchange', handleSelectionChange);
+	afterUpdate(() => {
+		// console.log('after update');
 	});
 </script>
 
