@@ -2,8 +2,6 @@
 	import { onMount, createEventDispatcher } from 'svelte';
 	import CreateAnnotation from './CreateAnnotation.svelte';
 
-	let context;
-
 	const dispatch = createEventDispatcher();
 
 	/**
@@ -154,23 +152,22 @@
 		};
 	}
 
-	let position;
+	/** This component instance **/
+	let me;
+
+	let selection = {};
 
 	onMount(() => {
-		return onSelect(context, details => {
+		return onSelect(me, details => {
 			console.log(details);
-			if (details) {
-				position = details.position;
-			} else {
-				position = null;
-			}
+			selection = details;
 			// dispatch('selectionchange', details);
 		});
 	});
 </script>
 
 <!-- FIXME: Why do I need this extra div? -->
-<div bind:this={context}>
+<div bind:this={me}>
 	<slot />
 </div>
-<CreateAnnotation {position} />
+<CreateAnnotation {selection} />

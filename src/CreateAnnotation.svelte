@@ -1,9 +1,10 @@
 <script>
 	import { onMount, createEventDispatcher } from 'svelte';
-	export let position;
-	//xport let range;
+	export let selection;
+	//export let range;
 	//export let text;
-	$: p = position || { x: -1000, y: -1000 };
+	let position;
+	$: ({ position = { x: -1000, y: -1000 } } = selection || {});
 	const nudge = 5;
 </script>
 
@@ -19,10 +20,10 @@
 
 		user-select: none;
 	}
-	button {
-	}
 </style>
 
-<div id="CreateAnnotation" style="top: {p.y + nudge}px; left: {p.x + nudge}px;">
+<div
+	id="CreateAnnotation"
+	style="top: {position.y + nudge}px; left: {position.x + nudge}px;">
 	<button>🖍 Add annotation…</button>
 </div>
