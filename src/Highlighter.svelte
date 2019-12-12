@@ -1,5 +1,6 @@
 <script>
 	import { onMount, createEventDispatcher } from 'svelte';
+	import CreateAnnotation from './CreateAnnotation.svelte';
 
 	let context;
 
@@ -125,7 +126,12 @@
 		function handleMouseUp(event) {
 			// console.log(event, isSelecting);
 			if (isSelecting && !document.getSelection().isCollapsed) {
-				callback((selection = document.getSelection()));
+				selection = document.getSelection();
+				callback({
+					text: selection.toString(),
+					range: getRange(selection),
+					position: { x: event.pageX, y: event.pageY }
+				});
 				isSelecting = false;
 			}
 		}
@@ -148,15 +154,23 @@
 		};
 	}
 
+	let position;
+
 	onMount(() => {
-		return onSelect(context, selection => {
-			// console.log(selection);
-			dispatch('selectionchange', getRange(selection));
+		return onSelect(context, details => {
+			console.log(details);
+			if (details) {
+				position = details.position;
+			} else {
+				position = null;
+			}
+			// dispatch('selectionchange', details);
 		});
 	});
 </script>
 
-<!-- Why do I need this extra div? -->
+<!-- FIXME: Why do I need this extra div? -->
 <div bind:this={context}>
 	<slot />
 </div>
+<CreateAnnotation {position} />
