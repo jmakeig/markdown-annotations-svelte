@@ -152,9 +152,6 @@
 		};
 	}
 
-	/** This component instance **/
-	let me;
-
 	let selection = {};
 
 	onMount(() => {
@@ -167,7 +164,5 @@
 </script>
 
 <!-- FIXME: Why do I need this extra div? -->
-<div bind:this={me}>
-	<slot />
-</div>
+<slot />
 <CreateAnnotation {selection} />
