@@ -153,7 +153,7 @@
 	}
 
 	let selection = {};
-
+	let me;
 	onMount(() => {
 		return onSelect(me, details => {
 			console.log(details);
@@ -164,5 +164,7 @@
 </script>
 
 <!-- FIXME: Why do I need this extra div? -->
-<slot />
+<div bind:this={me}>
+	<slot />
+</div>
 <CreateAnnotation {selection} />

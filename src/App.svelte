@@ -31,26 +31,7 @@ Hammock pug snackwave, XOXO church-key vexillologist drinking vinegar kogi disti
 
 Humblebrag pok pok tacos hella hammock cold-pressed skateboard slow-carb. Fixie sriracha artisan godard plaid cred. Irony disrupt wolf gochujang organic kale chips helvetica asymmetrical unicorn humblebrag cred yuccie swag glossier slow-carb. Authentic celiac selfies next level. Mixtape migas portland whatever, polaroid vinyl yr pitchfork wayfarers tilde normcore meh lomo. Chartreuse flannel pok pok ugh palo santo raclette hell of. Pug wayfarers twee occupy authentic, williamsburg palo santo PBR&B ugh seitan cred try-hard roof party.`;
 
-	const annotations = [
-		{
-			user: 'jmakeig',
-			timestamp: new Date().toISOString(),
-			comment: 'Scenester kitsch narwhal messenger bag hexagon blue',
-			range: {
-				start: { line: 2, column: 15 },
-				end: { line: 2, column: 55 }
-			}
-		},
-		{
-			user: 'dsthubbins',
-			timestamp: new Date().toISOString(),
-			comment: `Master cleanse authentic affogato tumblr literally, twee poutine 3 wolf moon. Typewriter scenester street art meh jianbing. Shoreditch coloring book microdosing listicle wayfarers wolf letterpress. Art party butcher humblebrag lumbersexual master cleanse green juice. Lyft echo park leggings messenger bag vice.`,
-			range: {
-				start: { line: 12, column: 77 },
-				end: { line: 12, column: 90 }
-			}
-		}
-	];
+	import { annotations } from './annotation-store.js';
 </script>
 
 <style>

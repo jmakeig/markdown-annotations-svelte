@@ -1,7 +1,7 @@
 <script>
-	export let data;
-
 	import { dateTimeLocalizer } from './i18n.js';
+	import { afterUpdate } from 'svelte';
+	import flash from './flash.js';
 
 	function formatDate(string) {
 		if (undefined === string || null === string) {
@@ -14,6 +14,13 @@
 		}
 		throw new TypeError(`${string} is not a Date`);
 	}
+
+	let me;
+	afterUpdate(() => {
+		flash(me);
+	});
+
+	export let id, user, timestamp, comment, range;
 </script>
 
 <style>
@@ -24,8 +31,8 @@
 	}
 </style>
 
-<section>
-	<div>{data.comment}</div>
-	<div>{formatDate(data.timestamp)}</div>
-	<div>{data.user}</div>
+<section data-id={id} bind:this={me}>
+	<div>{comment}</div>
+	<div>{formatDate(timestamp)}</div>
+	<div>{user}</div>
 </section>
