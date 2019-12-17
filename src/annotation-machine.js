@@ -1,4 +1,5 @@
 import { Machine } from 'xstate';
+//import { Machine } from 'xstate';
 
 const dirty = {
 	initial: 'clean',
@@ -10,29 +11,17 @@ const dirty = {
 		},
 		dirty: {
 			on: {
-				save: '#annotation.saving'
+				save: '#annotation.selected.saving'
 			}
 		}
 	}
 };
 
-export const annotationMachine = Machine({
-	id: 'annotation',
-	initial: 'unselected',
-	context: {
-		isNew: true,
-		errorMessage: null
-	},
+const selected = {
+	id: 'selected',
+	initial: 'aborted',
 	states: {
-		unselected: {
-			on: {
-				select: [
-					{ target: 'loading', cond: (context, event) => !context.isNew },
-					{ target: 'editing', cond: (context, event) => context.isNew }
-				]
-			}
-		},
-
+		creating: {},
 		loading: {
 			on: {
 				success: 'viewing',
@@ -40,7 +29,6 @@ export const annotationMachine = Machine({
 				cancel: 'aborted'
 			}
 		},
-		aborted: {},
 		viewing: {
 			on: {
 				edit: 'editing'
@@ -59,6 +47,35 @@ export const annotationMachine = Machine({
 				cancel: 'error'
 			}
 		},
-		error: {}
+		error: {},
+		aborted: {}
+	}
+};
+
+export const annotationMachine = Machine({
+	id: 'annotation',
+	initial: 'unselected',
+	context: {
+		isNew: true,
+		errorMessage: null
+	},
+	states: {
+		unselected: {
+			on: {
+				select: [
+					{
+						target: 'selected.loading',
+						cond: (context, event) => context.isNew
+					},
+					{
+						target: 'selected.creating',
+						cond: (context, event) => !context.isNew
+					}
+				]
+			}
+		},
+		selected: {
+			...selected
+		}
 	}
 });
