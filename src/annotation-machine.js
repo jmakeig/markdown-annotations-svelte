@@ -1,5 +1,9 @@
 import { Machine } from 'xstate';
-//import { Machine } from 'xstate';
+
+// Actions are on transitions
+// Entry/exit are on states
+
+// Mocks for testing services: https://medium.com/@tahini/how-to-effortlessly-model-async-react-with-xstates-invoke-4c36dc8547b3
 
 const dirty = {
 	initial: 'clean',
@@ -36,19 +40,26 @@ const selected = {
 		},
 		editing: {
 			on: {
-				cancel: 'viewing'
+				cancel: {
+					target: 'viewing'
+				}
 			},
+			entry: 'asdf',
 			...dirty
 		},
 		saving: {
 			on: {
 				success: 'viewing',
 				error: 'error',
-				cancel: 'error'
+				cancel: 'aborted'
 			}
 		},
 		error: {},
-		aborted: {}
+		aborted: {
+			on: {
+				reload: 'loading'
+			}
+		}
 	}
 };
 
@@ -75,7 +86,11 @@ export const annotationMachine = Machine({
 			}
 		},
 		selected: {
-			...selected
+			...selected,
+			on: {
+				blur: '#annotation.unselected'
+			},
+			exit: ['destroyAnnotation']
 		}
 	}
 });
