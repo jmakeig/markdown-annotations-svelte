@@ -25,7 +25,11 @@ const selected = {
 	id: 'selected',
 	initial: 'aborted',
 	states: {
-		creating: {},
+		creating: {
+			on: {
+				'': 'editing'
+			}
+		},
 		loading: {
 			on: {
 				success: 'viewing',
