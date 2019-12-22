@@ -5,7 +5,7 @@ import { Machine } from 'xstate';
 // Mocks for testing services: https://medium.com/@tahini/how-to-effortlessly-model-async-react-with-xstates-invoke-4c36dc8547b3
 
 function fetchAnnotation(id = null) {
-	return Promise.reject('oops!');
+	//return Promise.reject('oops!');
 	return Promise.resolve({
 		id,
 		comment: 'Dummy resolved',
@@ -44,7 +44,7 @@ const selected = {
 		loading: {
 			invoke: {
 				id: 'fetchAnnotation',
-				src: (context, event) => fetchAnnotation(),
+				src: (context, event) => fetchAnnotation(context.id),
 				onDone: {
 					target: 'viewing',
 					actions: assign({ annotation: (context, event) => event.data })
@@ -62,11 +62,10 @@ const selected = {
 		},
 		editing: {
 			on: {
-				cancel: {
-					target: 'viewing'
-				}
+				cancel: [
+					{ cond: (context, event) => null !== context.id, target: 'viewing' }
+				]
 			},
-			entry: 'asdf',
 			...dirty
 		},
 		saving: {
@@ -89,7 +88,7 @@ export const annotationMachine = Machine({
 	id: 'annotation',
 	initial: 'unselected',
 	context: {
-		id: null,
+		id: '1234',
 		errorMessage: null
 	},
 	states: {
