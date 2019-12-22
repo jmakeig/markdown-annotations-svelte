@@ -13,6 +13,11 @@ function fetchAnnotation(id = null) {
 	});
 }
 
+function saveAnnotation(annotation) {
+	//return Promise.reject('oops!');
+	return Promise.resolve(Object.assign({}, annotation));
+}
+
 const dirty = {
 	initial: 'clean',
 	states: {
@@ -31,8 +36,9 @@ const dirty = {
 
 const selected = {
 	id: 'selected',
-	initial: 'aborted',
+	initial: 'uninitialized',
 	states: {
+		uninitialized: {},
 		creating: {
 			on: {
 				'': 'editing'
@@ -69,18 +75,20 @@ const selected = {
 			...dirty
 		},
 		saving: {
-			on: {
-				success: 'viewing',
-				error: 'error',
-				cancel: 'aborted'
+			invoke: {
+				id: 'saveAnnotation',
+				src: (context, event) => saveAnnotation(context.annotation),
+				onDone: {
+					target: 'viewing',
+					actions: assign({ annotation: (context, event) => event.data })
+				},
+				onError: {
+					target: 'error',
+					actions: assign({ errorMessage: (context, event) => event.data })
+				}
 			}
 		},
-		error: {},
-		aborted: {
-			on: {
-				reload: 'loading'
-			}
-		}
+		error: {}
 	}
 };
 
