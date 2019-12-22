@@ -18,6 +18,17 @@ function saveAnnotation(annotation) {
 	return Promise.resolve(Object.assign({}, annotation));
 }
 
+function confirmCancel(message = 'You sure?') {
+	console.log(message);
+	return new Promise(function(resolve, reject) {
+		if (window.confirm(message)) {
+			resolve();
+		} else {
+			reject();
+		}
+	});
+}
+
 const dirty = {
 	initial: 'clean',
 	states: {
@@ -28,7 +39,22 @@ const dirty = {
 		},
 		dirty: {
 			on: {
-				save: '#annotation.selected.saving'
+				save: '#annotation.selected.saving',
+				cancel: { target: 'confirmingcancel' }
+			}
+		},
+		confirmingcancel: {
+			/*cond: (context, event) => null !== context.id,*/
+			/*target: '#annotation.selected.viewing'*/
+			invoke: {
+				id: 'confirmCancel',
+				src: (context, event) => confirmCancel('You sure?'),
+				onDone: {
+					target: '#annotation.selected.viewing'
+				},
+				onError: {
+					target: 'dirty'
+				}
 			}
 		}
 	}
@@ -68,9 +94,7 @@ const selected = {
 		},
 		editing: {
 			on: {
-				cancel: [
-					{ cond: (context, event) => null !== context.id, target: 'viewing' }
-				]
+				cancel: 'viewing'
 			},
 			...dirty
 		},
@@ -92,7 +116,7 @@ const selected = {
 	}
 };
 
-export const annotationMachine = Machine({
+const annotationMachine = Machine({
 	id: 'annotation',
 	initial: 'unselected',
 	context: {
