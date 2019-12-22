@@ -1,9 +1,17 @@
 import { Machine } from 'xstate';
-
 // Actions are on transitions
 // Entry/exit are on states
 
 // Mocks for testing services: https://medium.com/@tahini/how-to-effortlessly-model-async-react-with-xstates-invoke-4c36dc8547b3
+
+function fetchAnnotation(id = null) {
+	return Promise.reject('oops!');
+	return Promise.resolve({
+		id,
+		comment: 'Dummy resolved',
+		user: 'jmakeig'
+	});
+}
 
 const dirty = {
 	initial: 'clean',
@@ -28,13 +36,23 @@ const selected = {
 		creating: {
 			on: {
 				'': 'editing'
-			}
+			},
+			entry: assign({
+				annotation: (context, event) => ({ id: null, comment: 'NEW!' })
+			})
 		},
 		loading: {
-			on: {
-				success: 'viewing',
-				error: 'error',
-				cancel: 'aborted'
+			invoke: {
+				id: 'fetchAnnotation',
+				src: (context, event) => fetchAnnotation(),
+				onDone: {
+					target: 'viewing',
+					actions: assign({ annotation: (context, event) => event.data })
+				},
+				onError: {
+					target: 'error',
+					actions: assign({ errorMessage: (context, event) => event.data })
+				}
 			}
 		},
 		viewing: {
@@ -71,7 +89,7 @@ export const annotationMachine = Machine({
 	id: 'annotation',
 	initial: 'unselected',
 	context: {
-		isNew: true,
+		id: null,
 		errorMessage: null
 	},
 	states: {
@@ -80,11 +98,11 @@ export const annotationMachine = Machine({
 				select: [
 					{
 						target: 'selected.loading',
-						cond: (context, event) => context.isNew
+						cond: (context, event) => null !== context.id
 					},
 					{
 						target: 'selected.creating',
-						cond: (context, event) => !context.isNew
+						cond: (context, event) => null === context.id
 					}
 				]
 			}
