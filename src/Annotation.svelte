@@ -32,7 +32,7 @@
 </style>
 
 <section data-id={id} bind:this={me}>
-	<div>{comment}</div>
+	<div>{null === comment ? '' : comment}</div>
 	<div>{formatDate(timestamp)}</div>
 	<div>{user}</div>
 </section>

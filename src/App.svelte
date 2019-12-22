@@ -3,10 +3,6 @@
 	import Annotations from './Annotations.svelte';
 	import Highlighter from './Highlighter.svelte';
 
-	const dummy2 = `ASDF
-
-asdf`;
-
 	const dummy = `Kale chips art party subway tile, everyday carry bushwick slow-carb retro viral post-ironic waistcoat chillwave adaptogen kogi literally. Cray viral tofu fanny pack kale chips tumeric gentrify edison bulb ennui chicharrones VHS health goth. You probably haven't heard of them hoodie small batch forage sustainable, distillery aesthetic occupy mixtape disrupt normcore. Yuccie meditation ethical palo santo sustainable. Kinfolk bitters biodiesel poke put a bird on it wayfarers lomo hexagon single-origin coffee. Tbh single-origin coffee actually succulents.
 
 Kogi cronut pok pok umami artisan live-edge literally. Organic fashion axe church-key, portland raw denim hell of blue bottle farm-to-table paleo YOLO brunch pok pok gochujang post-ironic. Gentrify locavore williamsburg, gluten-free blue bottle art party poutine coloring book sriracha fixie cornhole before they sold out. Glossier hot chicken disrupt affogato, ugh seitan banh mi selvage shabby chic. Tumblr pabst glossier cold-pressed banjo kinfolk kickstarter fingerstache actually, polaroid succulents master cleanse food truck. Kogi 90's ennui post-ironic gochujang pickled. Kogi intelligentsia air plant, tofu hella la croix master cleanse.
@@ -32,6 +28,14 @@ Hammock pug snackwave, XOXO church-key vexillologist drinking vinegar kogi disti
 Humblebrag pok pok tacos hella hammock cold-pressed skateboard slow-carb. Fixie sriracha artisan godard plaid cred. Irony disrupt wolf gochujang organic kale chips helvetica asymmetrical unicorn humblebrag cred yuccie swag glossier slow-carb. Authentic celiac selfies next level. Mixtape migas portland whatever, polaroid vinyl yr pitchfork wayfarers tilde normcore meh lomo. Chartreuse flannel pok pok ugh palo santo raclette hell of. Pug wayfarers twee occupy authentic, williamsburg palo santo PBR&B ugh seitan cred try-hard roof party.`;
 
 	import { annotations } from './annotation-store.js';
+
+	function handleNewAnnotation(event) {
+		annotations.add({
+			comment: null,
+			user: 'jmakeig',
+			range: event.detail.range
+		});
+	}
 </script>
 
 <style>
@@ -65,7 +69,9 @@ Humblebrag pok pok tacos hella hammock cold-pressed skateboard slow-carb. Fixie 
 </header>
 <main>
 	<section id="Markdown">
-		<Highlighter on:selectionchange={event => console.log(event.detail)}>
+		<Highlighter
+			on:selectionchange={event => console.log(event.detail)}
+			on:newannotation={handleNewAnnotation}>
 			<Markdown text={dummy} {annotations} />
 		</Highlighter>
 	</section>

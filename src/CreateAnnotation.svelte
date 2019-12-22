@@ -1,11 +1,13 @@
 <script>
-	import { onMount, createEventDispatcher } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
 	export let selection;
 	//export let range;
 	//export let text;
 	let position;
 	$: ({ position = { x: -1000, y: -1000 } } = selection || {});
 	const nudge = 5;
+
+	const dispatch = createEventDispatcher();
 </script>
 
 <style>
@@ -25,5 +27,7 @@
 <div
 	id="CreateAnnotation"
 	style="top: {position.y + nudge}px; left: {position.x + nudge}px;">
-	<button>🖍 Add annotation…</button>
+	<button on:click={event => dispatch('newannotation', selection)}>
+		🖍 Add annotation…
+	</button>
 </div>

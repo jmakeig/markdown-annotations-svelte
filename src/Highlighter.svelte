@@ -156,15 +156,23 @@
 	let me;
 	onMount(() => {
 		return onSelect(me, details => {
-			console.log(details);
+			// console.log(details);
 			selection = details;
-			// dispatch('selectionchange', details);
 		});
 	});
+
+	function clearSelection() {
+		document.getSelection().removeAllRanges();
+	}
+
+	function handleNewAnnotation(event) {
+		dispatch('newannotation', event.detail);
+		clearSelection();
+	}
 </script>
 
 <!-- FIXME: Why do I need this extra div? -->
 <div bind:this={me}>
 	<slot />
 </div>
-<CreateAnnotation {selection} />
+<CreateAnnotation {selection} on:newannotation={handleNewAnnotation} />
