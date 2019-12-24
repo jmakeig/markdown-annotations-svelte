@@ -1,3 +1,4 @@
+import replace from '@rollup/plugin-replace';
 import svelte from 'rollup-plugin-svelte';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
@@ -15,6 +16,12 @@ export default {
 		file: 'public/build/bundle.js'
 	},
 	plugins: [
+		// https://github.com/davidkpiano/xstate/issues/787#issuecomment-553599685
+		replace({
+			'process.env.NODE_ENV': production
+				? JSON.stringify('production')
+				: JSON.stringify('development')
+		}),
 		svelte({
 			// enable run-time checks when not in production
 			dev: !production,
@@ -32,7 +39,8 @@ export default {
 		// https://github.com/rollup/rollup-plugin-commonjs
 		resolve({
 			browser: true,
-			dedupe: importee => importee === 'svelte' || importee.startsWith('svelte/')
+			dedupe: importee =>
+				importee === 'svelte' || importee.startsWith('svelte/')
 		}),
 		commonjs(),
 

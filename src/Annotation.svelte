@@ -1,7 +1,9 @@
 <script>
 	import { dateTimeLocalizer } from './i18n.js';
-	import { afterUpdate } from 'svelte';
+	import { onMount, afterUpdate } from 'svelte';
 	import flash from './flash.js';
+	import { annotationMachine } from './annotation-existing-machine.js';
+	import { interpret } from 'xstate';
 
 	function formatDate(string) {
 		if (undefined === string || null === string) {
@@ -14,6 +16,14 @@
 		}
 		throw new TypeError(`${string} is not a Date`);
 	}
+
+	let toggleService;
+
+	onMount(() => {
+		toggleService = interpret(annotationMachine)
+			.onTransition(state => console.log(state.value))
+			.start();
+	});
 
 	let me;
 	afterUpdate(() => {
@@ -31,7 +41,10 @@
 	}
 </style>
 
-<section data-id={id} bind:this={me}>
+<section
+	data-id={id}
+	bind:this={me}
+	on:click={event => toggleService.send('select')}>
 	<div>{null === comment ? '' : comment}</div>
 	<div>{formatDate(timestamp)}</div>
 	<div>{user}</div>
