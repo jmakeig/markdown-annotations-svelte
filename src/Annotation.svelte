@@ -2,8 +2,7 @@
 	import { dateTimeLocalizer } from './i18n.js';
 	import { onMount, afterUpdate } from 'svelte';
 	import flash from './flash.js';
-	import { annotationMachine } from './annotation-existing-machine.js';
-	import { interpret } from 'xstate';
+	import { AnnotationMachine } from './annotation-existing-machine.js';
 
 	function formatDate(string) {
 		if (undefined === string || null === string) {
@@ -17,13 +16,46 @@
 		throw new TypeError(`${string} is not a Date`);
 	}
 
-	let toggleService;
+	function fetchAnnotation(id) {
+		//return Promise.reject('oops!');
+		return Promise.resolve({
+			id,
+			comment: 'Dummy resolved',
+			user: 'jmakeig'
+		});
+	}
 
-	onMount(() => {
-		toggleService = interpret(annotationMachine)
-			.onTransition(state => console.log(state.value))
-			.start();
-	});
+	function confirmCancel(message = 'You sure?') {
+		return new Promise(function(resolve, reject) {
+			if (window.confirm(message)) {
+				resolve();
+			} else {
+				reject();
+			}
+		});
+	}
+
+	function saveAnnotation(annotation) {
+		//return Promise.reject('oops!');
+		return Promise.resolve(Object.assign({}, annotation));
+	}
+
+	let machineState;
+
+	const annotationMachine = AnnotationMachine(
+		fetchAnnotation,
+		confirmCancel,
+		saveAnnotation
+	);
+
+	annotationMachine
+		.onTransition(state => {
+			console.log(state);
+
+			// if (state.changed)
+			machineState = Object.assign({}, state);
+		})
+		.start();
 
 	let me;
 	afterUpdate(() => {
@@ -39,13 +71,27 @@
 		background: #efefef;
 		border-radius: 0.5em;
 	}
+	pre {
+		width: 100%;
+		overflow: auto;
+	}
 </style>
 
-<section
-	data-id={id}
-	bind:this={me}
-	on:click={event => toggleService.send('select')}>
-	<div>{null === comment ? '' : comment}</div>
-	<div>{formatDate(timestamp)}</div>
-	<div>{user}</div>
+<section data-id={id} bind:this={me}>
+	<pre>{JSON.stringify(machineState.value)}</pre>
+	<pre>{JSON.stringify(machineState.context)}</pre>
+	{#if machineState.matches('unselected')}
+		<button on:click={event => annotationMachine.send('select')}>Select</button>
+	{:else if machineState.matches('selected.viewing')}
+		<div>{null === comment ? '' : comment}</div>
+		<div>{formatDate(timestamp)}</div>
+		<div>{user}</div>
+		<button on:click={event => annotationMachine.send('edit')}>Edit</button>
+	{:else if machineState.matches('selected.editing')}
+		<textarea
+			on:change={event => {
+				annotationMachine.send('change', { comment: event.target.value });
+			}}
+			value={machineState.context.annotation.comment} />
+	{:else}FALL-THROUGH{/if}
 </section>

@@ -30,6 +30,7 @@ function confirmCancel(message = 'You sure?') {
 }
 
 const dirty = {
+	id: 'dirty',
 	initial: 'clean',
 	states: {
 		clean: {
@@ -49,9 +50,16 @@ const dirty = {
 			invoke: {
 				id: 'confirmCancel',
 				src: (context, event) => confirmCancel('You sure?'),
-				onDone: {
-					target: '#annotation.selected.viewing'
-				},
+				onDone: [
+					{
+						cond: (context, event) => null !== context.id,
+						target: '#annotation.selected.viewing'
+					},
+					{
+						cond: (context, event) => null === context.id,
+						target: '#annotation.selected.uninitialized'
+					}
+				],
 				onError: {
 					target: 'dirty'
 				}
@@ -94,7 +102,7 @@ const selected = {
 		},
 		editing: {
 			on: {
-				cancel: 'viewing'
+				cancel: [{ target: '#dirty.confirmingcancel' }]
 			},
 			...dirty
 		},
@@ -120,7 +128,8 @@ const annotationMachine = Machine({
 	id: 'annotation',
 	initial: 'unselected',
 	context: {
-		id: '1234',
+		// id: '1234',
+		id: null,
 		errorMessage: null
 	},
 	states: {

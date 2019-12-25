@@ -1,30 +1,6 @@
-import { Machine, assign } from 'xstate';
+import { Machine, assign, interpret } from 'xstate';
 
-function fetchAnnotation(id) {
-	//return Promise.reject('oops!');
-	return Promise.resolve({
-		id,
-		comment: 'Dummy resolved',
-		user: 'jmakeig'
-	});
-}
-
-function confirmCancel(message = 'You sure?') {
-	return new Promise(function(resolve, reject) {
-		if (window.confirm(message)) {
-			resolve();
-		} else {
-			reject();
-		}
-	});
-}
-
-function saveAnnotation(annotation) {
-	//return Promise.reject('oops!');
-	return Promise.resolve(Object.assign({}, annotation));
-}
-
-export const annotationMachine = Machine({
+const config = {
 	id: 'annotation',
 	initial: 'unselected',
 	context: {
@@ -51,14 +27,16 @@ export const annotationMachine = Machine({
 				loading: {
 					invoke: {
 						id: 'fetchAnnotation',
-						src: (context, event) => fetchAnnotation(context.id),
+						src: 'fetchAnnotationService',
 						onDone: {
 							target: 'viewing',
 							actions: assign({ annotation: (context, event) => event.data })
 						},
 						onError: {
 							target: 'error',
-							actions: assign({ errorMessage: (context, event) => event.data })
+							actions: assign({
+								errorMessage: (context, event) => event.data
+							})
 						}
 					}
 				},
@@ -74,7 +52,16 @@ export const annotationMachine = Machine({
 					states: {
 						clean: {
 							on: {
-								change: 'dirty',
+								change: {
+									target: 'dirty',
+									actions: assign({
+										annotation: (context, event) =>
+											// This is an awkward way to update the `comment` property
+											Object.assign({}, context.annotation, {
+												comment: event.comment
+											})
+									})
+								},
 								cancel: '#annotation.selected.viewing'
 							}
 						},
@@ -94,7 +81,7 @@ export const annotationMachine = Machine({
 								confirming: {
 									invoke: {
 										id: 'confirmCancel',
-										src: (context, event) => confirmCancel('You sure?'),
+										src: 'confirmCancelService',
 										onDone: {
 											target: '#annotation.selected.viewing'
 										},
@@ -106,7 +93,7 @@ export const annotationMachine = Machine({
 						saving: {
 							invoke: {
 								id: 'saveAnnotation',
-								src: (context, event) => saveAnnotation(context.annotation),
+								src: 'saveAnnotationService',
 								onDone: {
 									target: '#annotation.selected.viewing',
 									actions: assign({
@@ -125,4 +112,21 @@ export const annotationMachine = Machine({
 			}
 		}
 	}
-});
+};
+
+export function AnnotationMachine(
+	fetchAnnotation,
+	confirmCancel,
+	saveAnnotation
+) {
+	const options = {
+		actions: {},
+		services: {
+			fetchAnnotationService: (context, event) => fetchAnnotation(context.id),
+			confirmCancelService: (context, event) => confirmCancel(),
+			saveAnnotationService: (context, event) =>
+				saveAnnotation(context.annotation)
+		}
+	};
+	return interpret(Machine(config, options));
+}
