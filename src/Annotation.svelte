@@ -1,8 +1,11 @@
 <script>
+	import { debounce, count } from './util.js';
 	import { dateTimeLocalizer } from './i18n.js';
 	import { onMount, afterUpdate } from 'svelte';
 	import flash from './flash.js';
 	import { AnnotationMachine } from './annotation-existing-machine.js';
+
+	const counter = count('Annotation');
 
 	function formatDate(string) {
 		if (undefined === string || null === string) {
@@ -50,8 +53,7 @@
 
 	annotationMachine
 		.onTransition(state => {
-			console.log(state);
-
+			// console.log(state);
 			// if (state.changed)
 			machineState = Object.assign({}, state);
 		})
@@ -59,8 +61,32 @@
 
 	let me;
 	afterUpdate(() => {
+		// counter('afterUpdate');
 		flash(me);
 	});
+
+	function handleChange(initialValue, { wait = 250, immediate = false } = {}) {
+		function actuallyHandleChange(event) {
+			counter('actuallyHandleChange');
+			if (initialValue !== event.target.value) {
+				annotationMachine.send('change', { comment: event.target.value });
+			}
+		}
+		return debounce(actuallyHandleChange, wait, immediate);
+	}
+
+	function change(node, value) {
+		// counter('Annotation>comment: change action');
+		const handler = handleChange(value);
+		//node.addEventListener('change', handler);
+		node.addEventListener('input', handler);
+		return {
+			destroy() {
+				//node.removeEventListener('change', handler);
+				node.removeEventListener('input', handler);
+			}
+		};
+	}
 
 	export let id, user, timestamp, comment, range;
 </script>
@@ -89,9 +115,10 @@
 		<button on:click={event => annotationMachine.send('edit')}>Edit</button>
 	{:else if machineState.matches('selected.editing')}
 		<textarea
-			on:change={event => {
-				annotationMachine.send('change', { comment: event.target.value });
-			}}
+			use:change={machineState.context.annotation.comment}
 			value={machineState.context.annotation.comment} />
+		<button disabled={!machineState.matches('selected.editing.dirty')}>
+			Save
+		</button>
 	{:else}FALL-THROUGH{/if}
 </section>
