@@ -2,7 +2,7 @@
 	import { debounce, count } from './util.js';
 	import { dateTimeLocalizer } from './i18n.js';
 	import { onMount, afterUpdate } from 'svelte';
-	import flash from './flash.js';
+	import { flash } from './flash.js';
 	import { AnnotationMachine } from './annotation-existing-machine.js';
 
 	const counter = count('Annotation');

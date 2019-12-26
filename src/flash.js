@@ -1,4 +1,4 @@
-export default function flash(element) {
+export function flash(element) {
 	requestAnimationFrame(() => {
 		element.style.transition = 'none';
 		element.style.color = 'rgba(255,62,0,1)';
