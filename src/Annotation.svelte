@@ -83,6 +83,11 @@
 		};
 	}
 
+	function toHTML(str) {
+		if (null === str || undefined === str) return '';
+		return str.replace(/\n/g, '<br/>');
+	}
+
 	const DEBUG = false;
 </script>
 
@@ -128,7 +133,9 @@
 			<User name={user} />
 		</div>
 		{#if machineState.matches('selected.viewing')}
-			<div>{null === comment ? '' : comment}</div>
+			<div>
+				{@html toHTML(comment)}
+			</div>
 			<div>{formatDate(timestamp)}</div>
 			<button on:click={event => annotationMachine.send('edit')}>Edit</button>
 		{:else if machineState.matches('selected.editing')}
