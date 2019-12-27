@@ -1,7 +1,7 @@
 <script>
 	import { debounce, count } from './util.js';
 	import { formatDate } from './i18n.js';
-	import { onMount, afterUpdate } from 'svelte';
+	import { onMount, afterUpdate, tick } from 'svelte';
 	// import { flash } from './flash.js';
 	import { AnnotationMachine } from './annotation-existing-machine.js';
 	import User from './User.svelte';
@@ -70,17 +70,29 @@
 		);
 	}
 
-	function change(node, value) {
+	/**
+	 * Action to handle changing the comment field
+	 */
+	function change(textarea, value) {
 		// counter('Annotation>comment: change action');
 		const handler = handleChange();
 		//node.addEventListener('change', handler);
-		node.addEventListener('input', handler);
+		textarea.addEventListener('input', handler);
 		return {
 			destroy() {
 				//node.removeEventListener('change', handler);
-				node.removeEventListener('input', handler);
+				textarea.removeEventListener('input', handler);
 			}
 		};
+	}
+
+	/**
+	 * Action to set the focus on the textarea.
+	 */
+	function focus(textarea) {
+		tick().then(() => {
+			textarea.focus();
+		});
 	}
 
 	// TODO: {@html …} doesn’t sanitize. Probably should just do Markdown here.
@@ -178,6 +190,7 @@
 			<textarea
 				class="comment"
 				use:change={machineState.context.annotation.comment}
+				use:focus
 				value={machineState.context.annotation.comment} />
 			<div class="controls">
 				<button on:click={event => annotationMachine.send('cancel')}>
