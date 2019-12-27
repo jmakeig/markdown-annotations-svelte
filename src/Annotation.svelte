@@ -4,6 +4,7 @@
 	import { onMount, afterUpdate } from 'svelte';
 	import { flash } from './flash.js';
 	import { AnnotationMachine } from './annotation-existing-machine.js';
+	import User from './User.svelte';
 
 	const counter = count('Annotation');
 
@@ -96,11 +97,16 @@
 		font-family: inherit;
 		font-size: inherit;
 	}
+	.title {
+		display: flex;
+	}
+	/*
 	pre {
 		width: 100%;
 		overflow: auto;
 		font-size: 80%;
 	}
+	*/
 </style>
 
 <section data-id={id} bind:this={me}>
@@ -110,19 +116,23 @@
 		<button on:click={event => annotationMachine.send('select', { id })}>
 			Select
 		</button>
-	{:else if machineState.matches('selected.viewing')}
-		<div>{null === comment ? '' : comment}</div>
-		<div>{formatDate(timestamp)}</div>
-		<div>{user}</div>
-		<button on:click={event => annotationMachine.send('edit')}>Edit</button>
-	{:else if machineState.matches('selected.editing')}
-		<textarea
-			use:change={machineState.context.annotation.comment}
-			value={machineState.context.annotation.comment} />
-		<button
-			disabled={!machineState.matches('selected.editing.dirty')}
-			on:click={event => annotationMachine.send('save')}>
-			Save
-		</button>
-	{:else}FALL-THROUGH{/if}
+	{:else if machineState.matches('selected')}
+		<div class="title">
+			<User name={user} />
+		</div>
+		{#if machineState.matches('selected.viewing')}
+			<div>{null === comment ? '' : comment}</div>
+			<div>{formatDate(timestamp)}</div>
+			<button on:click={event => annotationMachine.send('edit')}>Edit</button>
+		{:else if machineState.matches('selected.editing')}
+			<textarea
+				use:change={machineState.context.annotation.comment}
+				value={machineState.context.annotation.comment} />
+			<button
+				disabled={!machineState.matches('selected.editing.dirty')}
+				on:click={event => annotationMachine.send('save')}>
+				Save
+			</button>
+		{:else}FALL-THROUGH{/if}
+	{/if}
 </section>
