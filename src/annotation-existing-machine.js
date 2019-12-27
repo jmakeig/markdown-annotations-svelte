@@ -1,12 +1,17 @@
 import { Machine, assign, interpret } from 'xstate';
 
+function clone(...rest) {
+	return Object.assign({}, ...rest);
+}
+
 const config = {
 	id: 'annotation',
 	initial: 'unselected',
 	context: {
 		id: null,
 		annotation: null,
-		errorMessage: null
+		errorMessage: null,
+		cache: null
 	},
 	states: {
 		unselected: {
@@ -51,6 +56,7 @@ const config = {
 				editing: {
 					id: 'editing',
 					initial: 'clean',
+					entry: assign({ cache: (c, e) => clone(c.annotation) }),
 					states: {
 						clean: {
 							on: {
@@ -83,7 +89,13 @@ const config = {
 										id: 'confirmCancel',
 										src: 'confirmCancelService',
 										onDone: {
-											target: '#annotation.selected.viewing'
+											target: '#annotation.selected.viewing',
+											actions: [
+												assign({
+													annotation: (context, event) => clone(context.cache)
+												}),
+												assign({ cache: (context, event) => null })
+											]
 										},
 										onError: { target: 'changing' }
 									}
@@ -118,22 +130,35 @@ const config = {
 // For XState visualizer
 
 function confirmCancel(message = 'You sure?') {
-	return new Promise(function(resolve, reject) {
-		if (window.confirm(message)) {
-			resolve();
-		} else {
-			reject();
-		}
-	});
+  return new Promise(function(resolve, reject) {
+    if (window.confirm(message)) {
+      resolve();
+    } else {
+      reject();
+    }
+  });
 }
 
 const options = {
-	actions: {},
-	services: {
-		fetchAnnotationService: (context, event) => Promise.resolve('ANN1234'),
-		confirmCancelService: (context, event) => confirmCancel(),
-		saveAnnotationService: (context, event) => Promise.resolve({})
-	}
+  actions: {
+    updateAnnotation: assign({
+      annotation: (context, event) =>
+        // This is an awkward way to update the `comment` property
+        Object.assign({}, context.annotation, {
+          comment: context.annotation.comment + 'X'
+        })
+    })
+  },
+  services: {
+    fetchAnnotationService: (context, event) =>
+      Promise.resolve({
+        id: 'ANN1234',
+        comment: 'Hi!',
+        timestamp: new Date().toISOString()
+      }),
+    confirmCancelService: (context, event) => confirmCancel(),
+    saveAnnotationService: (context, event) => Promise.resolve({})
+  }
 };
 
 const machine = Machine(config, options);
@@ -149,7 +174,7 @@ export function AnnotationMachine(
 			updateAnnotation: assign({
 				annotation: (context, event) =>
 					// This is an awkward way to update the `comment` property
-					Object.assign({}, context.annotation, {
+					clone(context.annotation, {
 						comment: event.comment
 					})
 			})

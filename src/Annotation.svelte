@@ -2,7 +2,7 @@
 	import { debounce, count } from './util.js';
 	import { formatDate } from './i18n.js';
 	import { onMount, afterUpdate } from 'svelte';
-	import { flash } from './flash.js';
+	// import { flash } from './flash.js';
 	import { AnnotationMachine } from './annotation-existing-machine.js';
 	import User from './User.svelte';
 
@@ -53,10 +53,13 @@
 		})
 		.start();
 
+	// Do I need this?
+	onMount(() => () => annotationMachine.stop());
+
 	let me;
 	afterUpdate(() => {
 		// counter('afterUpdate');
-		flash(me);
+		// flash(me);
 	});
 
 	function handleChange(initialValue, wait = 500) {
@@ -79,6 +82,8 @@
 			}
 		};
 	}
+
+	const DEBUG = false;
 </script>
 
 <style>
@@ -98,7 +103,7 @@
 		font-size: inherit;
 	}
 	.title {
-		display: flex;
+		font-size: 85%;
 	}
 	/*
 	pre {
@@ -110,8 +115,10 @@
 </style>
 
 <section data-id={id} bind:this={me}>
-	<pre>{JSON.stringify(machineState.value, null, 2)}</pre>
-	<pre>{JSON.stringify(machineState.context, null, 2)}</pre>
+	{#if DEBUG}
+		<pre>{JSON.stringify(machineState.value, null, 2)}</pre>
+		<pre>{JSON.stringify(machineState.context, null, 2)}</pre>
+	{/if}
 	{#if machineState.matches('unselected')}
 		<button on:click={event => annotationMachine.send('select', { id })}>
 			Select
@@ -133,6 +140,9 @@
 				on:click={event => annotationMachine.send('save')}>
 				Save
 			</button>
-		{:else}FALL-THROUGH{/if}
+			<button on:click={event => annotationMachine.send('cancel')}>
+				Cancel
+			</button>
+		{/if}
 	{/if}
 </section>
