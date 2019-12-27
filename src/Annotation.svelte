@@ -95,24 +95,51 @@
 
 <style>
 	section {
-		padding: 1em;
-		background: #efefef;
-		border-radius: 0.5em;
+		margin: 1em 0;
+		padding: 1em 1.5em;
+
+		border-radius: 0;
+		border: solid 1px #ccc;
+		box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.15);
 	}
+
+	.title {
+		display: flex;
+		padding-bottom: 0.75em;
+		border-bottom: solid 1px #ccc;
+	}
+	.title > .edit {
+		flex: 0;
+		padding: 0.5em;
+	}
+	.title > .user {
+		flex: 1;
+	}
+	.controls {
+		display: flex;
+		justify-content: flex-end;
+	}
+	.controls > * {
+		display: block;
+	}
+	/* DEBUG
+	section * {
+		outline: solid 0.5px #666 !important;
+	}*/
 	textarea.comment {
+		box-sizing: border-box;
 		width: 100%;
 		min-height: 8em;
 
-		padding: 0.25em;
-		margin: 0.75em -0.25em;
-		
+		padding: 0.5em;
+
+		border-color: #ccc;
+
 		font-family: inherit;
 		font-size: inherit;
 	}
 	.comment {
 		margin: 1em 0;
-		padding: 0;
-		border: solid 1px transparent;
 	}
 	/*
 	pre {
@@ -134,28 +161,34 @@
 		</button>
 	{:else if machineState.matches('selected')}
 		<div class="title">
-			<div>
+			<div class="user">
 				<User name={machineState.context.annotation.user}>
 					{formatDate(timestamp)}
 				</User>
 			</div>
+			{#if machineState.matches('selected.viewing')}
+				<div class="edit">
+					<button on:click={event => annotationMachine.send('edit')}>E</button>
+				</div>
+			{/if}
 		</div>
 		{#if machineState.matches('selected.viewing')}
 			<div class="comment">{toHTML(comment)}</div>
-			<button on:click={event => annotationMachine.send('edit')}>Edit</button>
 		{:else if machineState.matches('selected.editing')}
 			<textarea
 				class="comment"
 				use:change={machineState.context.annotation.comment}
 				value={machineState.context.annotation.comment} />
-			<button
-				disabled={!machineState.matches('selected.editing.dirty')}
-				on:click={event => annotationMachine.send('save')}>
-				Save
-			</button>
-			<button on:click={event => annotationMachine.send('cancel')}>
-				Cancel
-			</button>
+			<div class="controls">
+				<button on:click={event => annotationMachine.send('cancel')}>
+					Cancel
+				</button>
+				<button
+					disabled={!machineState.matches('selected.editing.dirty')}
+					on:click={event => annotationMachine.send('save')}>
+					Save
+				</button>
+			</div>
 		{/if}
 	{/if}
 </section>

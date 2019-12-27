@@ -1,13 +1,6 @@
 <script>
-	import { afterUpdate, createEventDispatcher } from 'svelte';
 	export let text;
 	export let annotations = [];
-
-	// const dispatch = createEventDispatcher();
-
-	afterUpdate(() => {
-		// console.log('after update');
-	});
 </script>
 
 <style>
@@ -40,5 +33,5 @@
 	{/each}
 </table>
 <svelte:head>
-	<title>Markdown Annotations ({Math.random()})</title>
+	<title>Markdown Annotations</title>
 </svelte:head>
