@@ -95,22 +95,24 @@
 
 <style>
 	section {
-		padding: 0.75em;
+		padding: 1em;
 		background: #efefef;
 		border-radius: 0.5em;
 	}
-	textarea {
+	textarea.comment {
 		width: 100%;
 		min-height: 8em;
 
 		padding: 0.25em;
-		line-height: 1.25;
-
+		margin: 0.75em -0.25em;
+		
 		font-family: inherit;
 		font-size: inherit;
 	}
-	.title {
-		font-size: 85%;
+	.comment {
+		margin: 1em 0;
+		padding: 0;
+		border: solid 1px transparent;
 	}
 	/*
 	pre {
@@ -132,14 +134,18 @@
 		</button>
 	{:else if machineState.matches('selected')}
 		<div class="title">
-			<User name={user} />
+			<div>
+				<User name={machineState.context.annotation.user}>
+					{formatDate(timestamp)}
+				</User>
+			</div>
 		</div>
 		{#if machineState.matches('selected.viewing')}
-			<div>{toHTML(comment)}</div>
-			<div>{formatDate(timestamp)}</div>
+			<div class="comment">{toHTML(comment)}</div>
 			<button on:click={event => annotationMachine.send('edit')}>Edit</button>
 		{:else if machineState.matches('selected.editing')}
 			<textarea
+				class="comment"
 				use:change={machineState.context.annotation.comment}
 				value={machineState.context.annotation.comment} />
 			<button
