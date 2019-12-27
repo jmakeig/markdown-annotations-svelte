@@ -1,31 +1,24 @@
 <script>
 	import { debounce, count } from './util.js';
-	import { dateTimeLocalizer } from './i18n.js';
+	import { formatDate } from './i18n.js';
 	import { onMount, afterUpdate } from 'svelte';
 	import { flash } from './flash.js';
 	import { AnnotationMachine } from './annotation-existing-machine.js';
 
 	const counter = count('Annotation');
 
-	function formatDate(string) {
-		if (undefined === string || null === string) {
-			throw new TypeError(`${String(string)} is not a Date`);
-		}
-		const date = new Date(string);
-		// https://stackoverflow.com/a/1353711/563324
-		if (!isNaN(date)) {
-			return dateTimeLocalizer.format(date);
-		}
-		throw new TypeError(`${string} is not a Date`);
-	}
+	export let instance;
+	$: ({ id, comment, user, timestamp, range } = instance);
 
+	export let services;
+
+	/**
+	 * Fake over-engineered Promise just in case I need to
+	 * retrieve this asynchronously in the future.
+	 */
 	function fetchAnnotation(id) {
 		//return Promise.reject('oops!');
-		return Promise.resolve({
-			id,
-			comment: 'Dummy resolved',
-			user: 'jmakeig'
-		});
+		return Promise.resolve(instance);
 	}
 
 	function confirmCancel(message = 'You sure?') {
@@ -40,7 +33,7 @@
 
 	function saveAnnotation(annotation) {
 		//return Promise.reject('oops!');
-		return Promise.resolve(Object.assign({}, annotation));
+		return Promise.resolve(services.update(annotation));
 	}
 
 	let machineState;
@@ -67,8 +60,9 @@
 
 	function handleChange(initialValue, { wait = 250, immediate = false } = {}) {
 		function actuallyHandleChange(event) {
-			counter('actuallyHandleChange');
+			// counter('actuallyHandleChange');
 			if (initialValue !== event.target.value) {
+				console.log('sending change', event.target.value);
 				annotationMachine.send('change', { comment: event.target.value });
 			}
 		}
@@ -87,8 +81,6 @@
 			}
 		};
 	}
-
-	export let id, user, timestamp, comment, range;
 </script>
 
 <style>
@@ -104,10 +96,12 @@
 </style>
 
 <section data-id={id} bind:this={me}>
-	<pre>{JSON.stringify(machineState.value)}</pre>
-	<pre>{JSON.stringify(machineState.context)}</pre>
+	<pre>{JSON.stringify(machineState.value, null, 2)}</pre>
+	<pre>{JSON.stringify(machineState.context, null, 2)}</pre>
 	{#if machineState.matches('unselected')}
-		<button on:click={event => annotationMachine.send('select')}>Select</button>
+		<button on:click={event => annotationMachine.send('select', { id })}>
+			Select
+		</button>
 	{:else if machineState.matches('selected.viewing')}
 		<div>{null === comment ? '' : comment}</div>
 		<div>{formatDate(timestamp)}</div>
@@ -117,7 +111,9 @@
 		<textarea
 			use:change={machineState.context.annotation.comment}
 			value={machineState.context.annotation.comment} />
-		<button disabled={!machineState.matches('selected.editing.dirty')}>
+		<button
+			disabled={!machineState.matches('selected.editing.dirty')}
+			on:click={event => annotationMachine.send('save')}>
 			Save
 		</button>
 	{:else}FALL-THROUGH{/if}

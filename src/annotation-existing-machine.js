@@ -13,7 +13,9 @@ const config = {
 			on: {
 				select: {
 					target: 'selected',
-					actions: assign({ id: (context, event) => '1234' })
+					actions: assign({
+						id: (context, event) => event.id
+					})
 				}
 			}
 		},
@@ -54,13 +56,7 @@ const config = {
 							on: {
 								change: {
 									target: 'dirty',
-									actions: assign({
-										annotation: (context, event) =>
-											// This is an awkward way to update the `comment` property
-											Object.assign({}, context.annotation, {
-												comment: event.comment
-											})
-									})
+									actions: 'updateAnnotation'
 								},
 								cancel: '#annotation.selected.viewing'
 							}
@@ -75,7 +71,11 @@ const config = {
 							states: {
 								changing: {
 									on: {
-										cancel: 'confirming'
+										cancel: 'confirming',
+										change: {
+											target: 'changing',
+											actions: 'updateAnnotation'
+										}
 									}
 								},
 								confirming: {
@@ -120,7 +120,15 @@ export function AnnotationMachine(
 	saveAnnotation
 ) {
 	const options = {
-		actions: {},
+		actions: {
+			updateAnnotation: assign({
+				annotation: (context, event) =>
+					// This is an awkward way to update the `comment` property
+					Object.assign({}, context.annotation, {
+						comment: event.comment
+					})
+			})
+		},
 		services: {
 			fetchAnnotationService: (context, event) => fetchAnnotation(context.id),
 			confirmCancelService: (context, event) => confirmCancel(),
@@ -130,3 +138,28 @@ export function AnnotationMachine(
 	};
 	return interpret(Machine(config, options));
 }
+
+/*
+// For XState visualizer
+
+function confirmCancel(message = 'You sure?') {
+	return new Promise(function(resolve, reject) {
+		if (window.confirm(message)) {
+			resolve();
+		} else {
+			reject();
+		}
+	});
+}
+
+const options = {
+	actions: {},
+	services: {
+		fetchAnnotationService: (context, event) => Promise.resolve('ANN1234'),
+		confirmCancelService: (context, event) => confirmCancel(),
+		saveAnnotationService: (context, event) => Promise.resolve({})
+	}
+};
+
+const machine = Machine(config, options);
+*/

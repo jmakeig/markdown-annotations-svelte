@@ -10,6 +10,16 @@ const items = writable([
 			start: { line: 1, column: 53 },
 			end: { line: 1, column: 100 }
 		}
+	},
+	{
+		id: 'ANN22222',
+		user: 'dsmalls',
+		comment: 'Another annotation that has some extra bonus text\n\nAnd another line',
+		timestamp: '2019-12-22T08:32:14.001Z',
+		range: {
+			start: { line: 1, column: 88 },
+			end: { line: 1, column: 92 }
+		}
 	}
 ]);
 
@@ -19,6 +29,7 @@ function stampTime(object) {
 
 export const annotations = {
 	subscribe: items.subscribe,
+	find: id => items.find(annotation => id === annotation.id),
 	add: annotation =>
 		items.update(state => [
 			...state,
