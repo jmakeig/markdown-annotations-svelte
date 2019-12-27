@@ -5,7 +5,7 @@
 	export let items;
 
 	afterUpdate(() => {
-		console.log(items);
+		// console.log(items);
 		// console.log('Annotations.afterUpdate');
 		// TODO: This is where the Annotation instances get positioned
 	});
