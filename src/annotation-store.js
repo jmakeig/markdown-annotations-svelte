@@ -14,7 +14,8 @@ const items = writable([
 	{
 		id: 'ANN22222',
 		user: 'dsmalls',
-		comment: 'Another annotation that has some extra bonus text\n\nAnd another line',
+		comment:
+			'Another annotation that has some extra bonus text\n\nAnd another line',
 		timestamp: '2019-12-22T08:32:14.001Z',
 		range: {
 			start: { line: 1, column: 88 },
@@ -39,17 +40,13 @@ export const annotations = {
 				})
 			)
 		]),
-	update: annotation =>
+	update: annotation => {
+		const updatedAnnotation = stampTime(Object.assign({}, annotation));
 		items.update(state =>
-			state.map(item => {
-				// console.log('id', item.id, annotation.id);
-				if (item.id === annotation.id) {
-					// console.log('with update', annotation);
-					return stampTime(Object.assign({}, annotation));
-				}
-				return item;
-			})
-		),
+			state.map(item => (item.id === annotation.id ? updatedAnnotation : item))
+		);
+		return updatedAnnotation;
+	},
 	delete: annotation =>
 		items.update(state => state.filter(item => annotation.id !== item.id)),
 	clear: () => items.update(state => [])
