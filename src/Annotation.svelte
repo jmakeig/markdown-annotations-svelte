@@ -83,9 +83,11 @@
 		};
 	}
 
+	// TODO: {@html …} doesn’t sanitize. Probably should just do Markdown here.
 	function toHTML(str) {
 		if (null === str || undefined === str) return '';
-		return str.replace(/\n/g, '<br/>');
+		//return str.replace(/\n/g, '<br/>');
+		return str;
 	}
 
 	const DEBUG = false;
@@ -133,9 +135,7 @@
 			<User name={user} />
 		</div>
 		{#if machineState.matches('selected.viewing')}
-			<div>
-				{@html toHTML(comment)}
-			</div>
+			<div>{toHTML(comment)}</div>
 			<div>{formatDate(timestamp)}</div>
 			<button on:click={event => annotationMachine.send('edit')}>Edit</button>
 		{:else if machineState.matches('selected.editing')}
