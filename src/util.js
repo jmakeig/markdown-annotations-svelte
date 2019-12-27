@@ -1,5 +1,5 @@
 /** Adapted from https://davidwalsh.name/javascript-debounce-function */
-export function debounce(func, wait, immediate) {
+export function debounce(func, wait = 250, immediate = false) {
 	let timeout;
 	return function _debounce() {
 		const context = this,

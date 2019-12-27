@@ -58,20 +58,17 @@
 		flash(me);
 	});
 
-	function handleChange(initialValue, { wait = 250, immediate = false } = {}) {
-		function actuallyHandleChange(event) {
-			// counter('actuallyHandleChange');
-			if (initialValue !== event.target.value) {
-				console.log('sending change', event.target.value);
-				annotationMachine.send('change', { comment: event.target.value });
-			}
-		}
-		return debounce(actuallyHandleChange, wait, immediate);
+	function handleChange(initialValue, wait = 500) {
+		return debounce(
+			event =>
+				annotationMachine.send('change', { comment: event.target.value }),
+			wait
+		);
 	}
 
 	function change(node, value) {
 		// counter('Annotation>comment: change action');
-		const handler = handleChange(value);
+		const handler = handleChange();
 		//node.addEventListener('change', handler);
 		node.addEventListener('input', handler);
 		return {
@@ -89,9 +86,20 @@
 		background: #efefef;
 		border-radius: 0.5em;
 	}
+	textarea {
+		width: 100%;
+		min-height: 8em;
+
+		padding: 0.25em;
+		line-height: 1.25;
+
+		font-family: inherit;
+		font-size: inherit;
+	}
 	pre {
 		width: 100%;
 		overflow: auto;
+		font-size: 80%;
 	}
 </style>
 
