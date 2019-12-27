@@ -114,31 +114,6 @@ const config = {
 	}
 };
 
-export function AnnotationMachine(
-	fetchAnnotation,
-	confirmCancel,
-	saveAnnotation
-) {
-	const options = {
-		actions: {
-			updateAnnotation: assign({
-				annotation: (context, event) =>
-					// This is an awkward way to update the `comment` property
-					Object.assign({}, context.annotation, {
-						comment: event.comment
-					})
-			})
-		},
-		services: {
-			fetchAnnotationService: (context, event) => fetchAnnotation(context.id),
-			confirmCancelService: (context, event) => confirmCancel(),
-			saveAnnotationService: (context, event) =>
-				saveAnnotation(context.annotation)
-		}
-	};
-	return interpret(Machine(config, options));
-}
-
 /*
 // For XState visualizer
 
@@ -163,3 +138,28 @@ const options = {
 
 const machine = Machine(config, options);
 */
+
+export function AnnotationMachine(
+	fetchAnnotation,
+	confirmCancel,
+	saveAnnotation
+) {
+	const options = {
+		actions: {
+			updateAnnotation: assign({
+				annotation: (context, event) =>
+					// This is an awkward way to update the `comment` property
+					Object.assign({}, context.annotation, {
+						comment: event.comment
+					})
+			})
+		},
+		services: {
+			fetchAnnotationService: (context, event) => fetchAnnotation(context.id),
+			confirmCancelService: (context, event) => confirmCancel(),
+			saveAnnotationService: (context, event) =>
+				saveAnnotation(context.annotation)
+		}
+	};
+	return interpret(Machine(config, options));
+}
