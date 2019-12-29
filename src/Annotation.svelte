@@ -106,6 +106,9 @@
 </script>
 
 <style>
+	/* * {
+		outline: solid 1px green;
+	} */
 	section {
 		margin: 1em 0;
 		padding: 1em 1.5em;
@@ -113,16 +116,22 @@
 		border-radius: 0;
 		border: solid 1px #ccc;
 		box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.15);
+
+		position: relative;
 	}
 
 	.title {
 		display: flex;
+	}
+	.selected .title {
 		padding-bottom: 0.75em;
 		border-bottom: solid 1px #ccc;
 	}
 	.title > .edit {
 		flex: 0;
+		text-align: right;
 		padding: 0.5em;
+		display: flex;
 	}
 	.title > .user {
 		flex: 1;
@@ -153,6 +162,17 @@
 	.comment {
 		margin: 1em 0;
 	}
+	.close {
+		position: absolute;
+		top: 0.1em;
+		right: 0.1em;
+		z-index: 10;
+	}
+	.close button {
+		background-color: transparent;
+		border-style: none;
+		color: #ccc;
+	}
 	/*
 	pre {
 		width: 100%;
@@ -162,16 +182,30 @@
 	*/
 </style>
 
-<section data-id={id} bind:this={me}>
+<section
+	data-id={id}
+	bind:this={me}
+	class={machineState.matches('unselected') ? 'unselected' : 'selected'}>
 	{#if DEBUG}
 		<pre>{JSON.stringify(machineState.value, null, 2)}</pre>
 		<pre>{JSON.stringify(machineState.context, null, 2)}</pre>
 	{/if}
 	{#if machineState.matches('unselected')}
-		<button on:click={event => annotationMachine.send('select', { id })}>
-			Select
-		</button>
+		<div class="title">
+			<div class="user">
+				<!-- TODO: Need to figure out where to store user -->
+				<User name={'jmakeig'}>{formatDate(timestamp)}</User>
+			</div>
+			<div class="edit">
+				<button on:click={event => annotationMachine.send('select', { id })}>
+					S
+				</button>
+			</div>
+		</div>
 	{:else if machineState.matches('selected')}
+		<div class="close">
+			<button title="Close" on:click={event => annotationMachine.send('blur')}>X</button>
+		</div>
 		<div class="title">
 			<div class="user">
 				<User name={machineState.context.annotation.user}>
