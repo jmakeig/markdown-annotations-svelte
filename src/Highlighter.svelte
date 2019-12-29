@@ -166,6 +166,7 @@
 	}
 
 	function handleNewAnnotation(event) {
+		// event.detail === {text: "occupy", range: {start: {line: 1, column: 337}, end: {line: 1, column: 343}}, position: {x: 494, y: 135}}
 		dispatch('newannotation', event.detail);
 		clearSelection();
 	}

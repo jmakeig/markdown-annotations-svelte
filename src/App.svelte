@@ -1,7 +1,14 @@
 <script>
+	import { setContext } from 'svelte';
+
 	import Markdown from './Markdown.svelte';
 	import Annotations from './Annotations.svelte';
 	import Highlighter from './Highlighter.svelte';
+
+	import { annotations } from './annotation-store.js';
+	import { user } from './user-store.js';
+
+	setContext('user', user);
 
 	const dummy = `Kale chips art party subway tile, everyday carry bushwick slow-carb retro viral post-ironic waistcoat chillwave adaptogen kogi literally. Cray viral tofu fanny pack kale chips tumeric gentrify edison bulb ennui chicharrones VHS health goth. You probably haven't heard of them hoodie small batch forage sustainable, distillery aesthetic occupy mixtape disrupt normcore. Yuccie meditation ethical palo santo sustainable. Kinfolk bitters biodiesel poke put a bird on it wayfarers lomo hexagon single-origin coffee. Tbh single-origin coffee actually succulents.
 
@@ -26,8 +33,6 @@ Lyft brooklyn beard, XOXO flexitarian selfies +1 before they sold out succulents
 Hammock pug snackwave, XOXO church-key vexillologist drinking vinegar kogi distillery pitchfork chillwave vaporware VHS. Tbh portland leggings mumblecore edison bulb artisan, truffaut blog humblebrag austin listicle. Hell of truffaut pork belly cronut copper mug hoodie, fixie taxidermy polaroid. Pinterest deep v farm-to-table gentrify ethical hashtag. Jianbing fanny pack ramps DIY, taiyaki wayfarers lomo tote bag keytar PBR&B bicycle rights migas gluten-free.
 
 Humblebrag pok pok tacos hella hammock cold-pressed skateboard slow-carb. Fixie sriracha artisan godard plaid cred. Irony disrupt wolf gochujang organic kale chips helvetica asymmetrical unicorn humblebrag cred yuccie swag glossier slow-carb. Authentic celiac selfies next level. Mixtape migas portland whatever, polaroid vinyl yr pitchfork wayfarers tilde normcore meh lomo. Chartreuse flannel pok pok ugh palo santo raclette hell of. Pug wayfarers twee occupy authentic, williamsburg palo santo PBR&B ugh seitan cred try-hard roof party.`;
-
-	import { annotations } from './annotation-store.js';
 
 	function handleNewAnnotation(event) {
 		annotations.add({

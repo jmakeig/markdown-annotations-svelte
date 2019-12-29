@@ -18,8 +18,8 @@ const items = writable([
 			'Another annotation that has some extra bonus text\n\nAnd another line',
 		timestamp: '2019-12-22T08:32:14.001Z',
 		range: {
-			start: { line: 1, column: 88 },
-			end: { line: 1, column: 92 }
+			start: { line: 1, column: 102 },
+			end: { line: 1, column: 192 }
 		}
 	}
 ]);
