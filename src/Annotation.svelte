@@ -115,9 +115,13 @@
 
 		border-radius: 0;
 		border: solid 1px #ccc;
-		box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.15);
 
+		/* So the close button can be absolutely positioned */
 		position: relative;
+	}
+
+	section.selected {
+		box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.15);
 	}
 
 	.title {
@@ -127,10 +131,9 @@
 		padding-bottom: 0.75em;
 		border-bottom: solid 1px #ccc;
 	}
-	.title > .edit {
+	.title > .edit > * {
 		flex: 0;
 		text-align: right;
-		padding: 0.5em;
 		display: flex;
 	}
 	.title > .user {
@@ -194,7 +197,7 @@
 		<div class="title">
 			<div class="user">
 				<!-- TODO: Need to figure out where to store user -->
-				<User name={'jmakeig'}>{formatDate(timestamp)}</User>
+				<User name={user}>{formatDate(timestamp)}</User>
 			</div>
 			<div class="edit">
 				<button on:click={event => annotationMachine.send('select', { id })}>
@@ -204,7 +207,9 @@
 		</div>
 	{:else if machineState.matches('selected')}
 		<div class="close">
-			<button title="Close" on:click={event => annotationMachine.send('blur')}>X</button>
+			<button title="Close" on:click={event => annotationMachine.send('blur')}>
+				X
+			</button>
 		</div>
 		<div class="title">
 			<div class="user">
