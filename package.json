@@ -19,6 +19,6 @@
 	"dependencies": {
 		"color-hash": "^1.0.3",
 		"sirv-cli": "^0.4.5",
-		"xstate": "^4.7.3"
+		"xstate": "^4.7.5"
 	}
 }
