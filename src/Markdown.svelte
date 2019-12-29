@@ -21,6 +21,9 @@
 		content: attr(data-line) '.';
 		user-select: none;
 	}
+	table {
+		line-height: 1.85;
+	}
 </style>
 
 <table>
