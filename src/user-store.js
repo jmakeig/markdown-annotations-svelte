@@ -10,15 +10,9 @@ const _user = writable({
 
 export const user = {
 	subscribe: _user.subscribe,
+	set: _user.set,
 	get color() {
-		return {
-			asHex() {
-				return hashColor.asHex(_user.name);
-			},
-			asRGB() {
-				return hashColor.asRGB(_user.name);
-			}
-		};
+		return hashColor(_user.name);
 	}
 };
 

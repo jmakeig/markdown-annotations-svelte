@@ -8,6 +8,12 @@
 	import { annotations } from './annotation-store.js';
 	import { user } from './user-store.js';
 
+	// TODO: Implement auth. Only need to auth just-in-time when updating. Shouldn’t require auth to view.
+	$user = {
+		name: 'jmakeig',
+		avatar: null
+	};
+
 	setContext('user', user);
 
 	const dummy = `Kale chips art party subway tile, everyday carry bushwick slow-carb retro viral post-ironic waistcoat chillwave adaptogen kogi literally. Cray viral tofu fanny pack kale chips tumeric gentrify edison bulb ennui chicharrones VHS health goth. You probably haven't heard of them hoodie small batch forage sustainable, distillery aesthetic occupy mixtape disrupt normcore. Yuccie meditation ethical palo santo sustainable. Kinfolk bitters biodiesel poke put a bird on it wayfarers lomo hexagon single-origin coffee. Tbh single-origin coffee actually succulents.
