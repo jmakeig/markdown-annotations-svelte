@@ -7,8 +7,8 @@ const items = writable([
 		comment: 'Here is some text',
 		timestamp: '2019-12-16T22:14:28.872Z',
 		range: {
-			start: { line: 1, column: 53 },
-			end: { line: 1, column: 100 }
+			start: { line: 1, column: 120 },
+			end: { line: 1, column: 500 }
 		}
 	},
 	{
@@ -18,8 +18,8 @@ const items = writable([
 			'Another annotation that has some extra bonus text\n\nAnd another line',
 		timestamp: '2019-12-22T08:32:14.001Z',
 		range: {
-			start: { line: 1, column: 102 },
-			end: { line: 1, column: 192 }
+			start: { line: 1, column: 12 },
+			end: { line: 1, column: 67 }
 		}
 	}
 ]);
@@ -28,7 +28,7 @@ function stampTime(object) {
 	return Object.assign({}, object, { timestamp: new Date().toISOString() });
 }
 
-export const annotations = {
+export const _annotations = {
 	subscribe: items.subscribe,
 	find: id => items.find(annotation => id === annotation.id),
 	add: annotation =>
@@ -52,4 +52,19 @@ export const annotations = {
 	clear: () => items.update(state => [])
 };
 
-// export const sorted = derived(todos_, (todos_) => sortBy(todos_, 'checkboxed'))
+function documentOrder(a, b) {
+	if (a.range.start.line > b.range.start.line) return true;
+	if (a.range.start.line === b.range.start.line) {
+		return a.range.start.column > b.range.start.column;
+	}
+	return false;
+}
+
+export const annotations = {
+	...derived(_annotations, $a => $a.sort(documentOrder)),
+	find: _annotations.find,
+	add: _annotations.add,
+	update: _annotations.update,
+	delete: _annotations.delete,
+	clear: _annotations.clear
+};
