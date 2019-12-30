@@ -69,7 +69,6 @@
 		parentEnd = parentStart,
 		end = 0
 	) {
-		console.log('rangeFromOffsets', parentStart, start, parentEnd, end);
 		const range = document.createRange();
 		const s = nodeFromTextOffset(parentStart, start);
 		const e = nodeFromTextOffset(parentEnd, end);
@@ -88,10 +87,6 @@
 		dispatch
 	) {
 		if (!annotation) return;
-		console.log(
-			document.querySelector(`#L${annotation.range.start.line}>td.content`),
-			document.querySelector(`#L${annotation.range.end.line}>td.content`)
-		);
 		const r = rangeFromOffsets(
 			document.querySelector(`#L${annotation.range.start.line}>td.content`),
 			annotation.range.start.column,
@@ -126,10 +121,10 @@
 	}
 
 	function highlight(node, params) {
-		console.log('highlight', params);
 		tick()
 			.then(() => {
 				for (const annotation of $annotations) {
+					console.log('Rendering annotation highlight', annotation);
 					renderAnnotationHighlight(annotation, false, false);
 				}
 			})
