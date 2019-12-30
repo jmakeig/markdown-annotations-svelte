@@ -124,8 +124,16 @@
 		tick()
 			.then(() => {
 				for (const annotation of $annotations) {
-					console.log('Rendering annotation highlight', annotation);
-					renderAnnotationHighlight(annotation, false, false);
+					// console.log(
+					// 	'Rendering annotation highlight',
+					// 	annotation,
+					// 	annotation.user === $user.name
+					// );
+					renderAnnotationHighlight(
+						annotation,
+						annotation.user === $user.name,
+						false
+					);
 				}
 			})
 			.catch(error => console.error(error));
