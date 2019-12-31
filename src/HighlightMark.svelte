@@ -1,5 +1,14 @@
 <script>
+	import { onMount, afterUpdate, onDestroy, getContext, tick } from 'svelte';
+	import { highlightRange } from './highlight-range.js';
+
+	import { hashColor } from './user-store.js';
+
 	export let annotation;
+	export let isActive;
+
+	const user = getContext('user');
+	const parent = getContext('table');
 
 	/**
 	 *
@@ -26,6 +35,25 @@
 		}
 		return { node: node, offset: last };
 	}
+	/**
+	 * Descendent-or-self until you get a `TextNode`
+	 *
+	 * @param {Node} node
+	 * @return {TextNode} - Or `undefined` if there are not text
+	 *                      children, e.g. `<br/>`
+	 */
+	function childTextNodeOrSelf(node) {
+		if (!node) return;
+		if (!(node instanceof Node)) throw new TypeError(node.constructor.name);
+
+		if (Node.TEXT_NODE === node.nodeType) {
+			return node;
+		}
+		if (node.firstChild) {
+			return childTextNodeOrSelf(node.firstChild);
+		}
+		return undefined;
+	}
 
 	/**
 	 * Some stuff
@@ -42,11 +70,9 @@
 		parentEnd = parentStart,
 		end = 0
 	) {
-		// console.log('rangeFromOffsets', parentStart, start, parentEnd, end);
 		const range = document.createRange();
 		const s = nodeFromTextOffset(parentStart, start);
 		const e = nodeFromTextOffset(parentEnd, end);
-		// console.log('rangeFromOffsets#nodeFromTextOffset', s, e);
 		range.setStart(childTextNodeOrSelf(s.node), s.offset);
 		range.setEnd(childTextNodeOrSelf(e.node), e.offset);
 
@@ -61,19 +87,21 @@
 		dispatch
 	) {
 		if (!annotation) return;
+		const scope = parent.ref;
 		const r = rangeFromOffsets(
-			document.querySelector(`#L${annotation.range.start.line}>td.content`),
+			scope.querySelector(`#L${annotation.range.start.line}>td.content`),
 			annotation.range.start.column,
-			document.querySelector(`#L${annotation.range.end.line}>td.content`),
+			scope.querySelector(`#L${annotation.range.end.line}>td.content`),
 			annotation.range.end.column
 		);
 		let first;
-		highlightRange(r, (node, index) => {
+		/* Returns a function that will remove the annotation parts. Perfect for the destroy lifecycle event. */
+		return highlightRange(r, (node, index) => {
 			// FIXME: Fix this in highlight-range.js
 			index = parseInt(index, 10);
 
 			const mark = document.createElement('mark');
-			mark.classList.add('annotation-highlight');
+			// mark.classList.add('annotation-highlight');
 			mark.dataset.annotationId = annotation.id;
 			if (isMine) {
 				mark.classList.add('mine');
@@ -81,42 +109,24 @@
 			if (isActive) {
 				mark.classList.add('active');
 			}
-			mark.style.backgroundColor = `rgba(${new ColorHash()
-				.rgb(annotation.user)
-				.join(', ')}, 0.5)`;
-			mark.onclick = evt => {
-				dispatch(annotationSelect(evt.target.dataset.annotationId));
+
+			Object.assign(mark.style, hashColor(annotation.user));
+			mark.onclick = event => {
+				//dispatch(annotationSelect(evt.target.dataset.annotationId));
+				console.log('clicked', event);
 			};
 			if (0 === index) first = mark;
 			return mark;
 		});
 		// The offset from the container
-		return first.getBoundingClientRect().y - relativeY;
+		// return first.getBoundingClientRect().y - relativeY;
 	}
 
-	/**
-	 * @action
-	 */
-	function render(node) {
-		console.log('render', annotation);
-		return {
-			update(params) {
-				console.log('render.update', params, annotation);
-			},
-			destroy() {
-				console.log('render.destroy', annotation);
-			}
-		};
-	}
+	onMount(() => {
+		return renderAnnotationHighlight(
+			annotation,
+			annotation.user === $user.name,
+			false
+		);
+	});
 </script>
-
-<style>
-	mark {
-		background-color: yellow;
-	}
-</style>
-
-<mark data-annotationid={annotation.id} bind:this={markNode}>
-	{annotation.id}
-</mark>
-<br />
