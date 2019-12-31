@@ -2,14 +2,26 @@ import { writable, derived } from 'svelte/store';
 
 const items = writable([
 	{
+		id: 'ANN33333',
+		user: 'ntufnel',
+		comment: 'This. Is. Another. Annotation.',
+		timestamp: '2019-12-22T08:32:14.001Z',
+		range: {
+			start: { line: 1, column: 88 },
+			end: { line: 1, column: 95 }
+		},
+		active: false
+	},
+	{
 		id: 'ANN12345',
 		user: 'jmakeig',
 		comment: 'Here is some text',
 		timestamp: '2019-12-16T22:14:28.872Z',
 		range: {
-			start: { line: 1, column: 120 },
-			end: { line: 1, column: 500 }
-		}
+			start: { line: 3, column: 120 },
+			end: { line: 3, column: 500 }
+		},
+		active: false
 	},
 	{
 		id: 'ANN22222',
@@ -18,9 +30,22 @@ const items = writable([
 			'Another annotation that has some extra bonus text\n\nAnd another line',
 		timestamp: '2019-12-22T08:32:14.001Z',
 		range: {
-			start: { line: 1, column: 12 },
-			end: { line: 1, column: 67 }
-		}
+			start: { line: 5, column: 12 },
+			end: { line: 7, column: 67 }
+		},
+		active: true
+	},
+	{
+		id: 'ANN44444',
+		user: 'dsmalls',
+		comment:
+			'Another annotation that has some extra bonus text\n\nAnd another line',
+		timestamp: '2019-12-22T08:32:14.001Z',
+		range: {
+			start: { line: 25, column: 3 },
+			end: { line: 25, column: 8 }
+		},
+		active: true
 	}
 ]);
 
