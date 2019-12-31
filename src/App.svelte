@@ -1,6 +1,7 @@
 <script>
 	import { setContext } from 'svelte';
 
+	import User from './User.svelte';
 	import Markdown from './Markdown.svelte';
 	import Annotations from './Annotations.svelte';
 	import Highlighter from './Highlighter.svelte';
@@ -73,10 +74,25 @@ Humblebrag pok pok tacos hella hammock cold-pressed skateboard slow-carb. Fixie 
 		/* background: yellow; */
 		border-left: solid 0.5px #ccc;
 	}
+	header {
+		display: flex;
+	}
+	header > h1 {
+		flex: 1;
+	}
+	section#User {
+		width: 8em;
+	}
+	h1 {
+		margin: 0;
+	}
 </style>
 
 <header>
 	<h1>Markdown Annotations</h1>
+	<section id="User">
+		<User name={$user.name} />
+	</section>
 </header>
 <main>
 	<section id="Markdown">
