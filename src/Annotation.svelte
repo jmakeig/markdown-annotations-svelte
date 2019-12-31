@@ -193,6 +193,7 @@
 		<pre>{JSON.stringify(machineState.value, null, 2)}</pre>
 		<pre>{JSON.stringify(machineState.context, null, 2)}</pre>
 	{/if}
+	<button on:click={event => services.delete(instance)}>DELETE</button>
 	{#if machineState.matches('unselected')}
 		<div class="title">
 			<div class="user">
