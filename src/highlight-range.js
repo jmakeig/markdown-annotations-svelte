@@ -21,7 +21,11 @@
 //                     return span;
 //                   });
 //                 }
-function highlightRange(rangeObject, highlightTemplate) {
+function highlightRange(
+	rangeObject,
+	highlightTemplate,
+	excludePredicate = node => false
+) {
 	// Ignore range if empty.
 	if (rangeObject.collapsed) {
 		return;
@@ -41,7 +45,14 @@ function highlightRange(rangeObject, highlightTemplate) {
 	// Highlight each node
 	var highlights = [];
 	for (var nodeIdx in nodes) {
-		highlights.push(highlightNode(nodes[nodeIdx], highlightCallback));
+		const highlighted = highlightNode(
+			nodes[nodeIdx],
+			highlightCallback,
+			excludePredicate
+		);
+		if (highlighted) {
+			highlights.push(highlighted);
+		}
 	}
 
 	// The rangeObject gets messed up by our DOM changes. Be kind and restore.
@@ -226,10 +237,12 @@ function setRangeToTextNodes(rangeObject) {
 }
 
 // Replace [node] with a constructed node</span>
-function highlightNode(node, highlightCallback) {
+function highlightNode(node, highlightCallback, excludePredicate) {
+	// if ('TR' === node.parentNode.nodeName.toUpperCase()) return;
+	if (excludePredicate(node)) return;
+
 	// Create a highlight
 	var highlight = highlightCallback(node);
-
 	// Wrap it around the text node
 	node.parentNode.replaceChild(highlight, node);
 	highlight.appendChild(node);

@@ -90,37 +90,44 @@
 		const scope = parent.ref;
 		const r = rangeFromOffsets(
 			scope.querySelector(`#L${annotation.range.start.line}>td.content`),
-			annotation.range.start.column,
+			annotation.range.start.column - 1,
 			scope.querySelector(`#L${annotation.range.end.line}>td.content`),
-			annotation.range.end.column
+			annotation.range.end.column - 1
 		);
 		let first;
 		/* Returns a function that will remove the annotation parts. Perfect for the destroy lifecycle event. */
-		return highlightRange(r, (node, index) => {
-			// FIXME: Fix this in highlight-range.js
-			index = parseInt(index, 10);
+		return highlightRange(
+			r,
+			(node, index) => {
+				// FIXME: Implement this in highlight-range.js
+				index = parseInt(index, 10);
 
-			const mark = document.createElement('mark');
-			// mark.classList.add('annotation-highlight');
-			mark.dataset.annotationId = annotation.id;
-			if (isMine) {
-				mark.classList.add('mine');
-			}
-			if (isActive) {
-				mark.classList.add('active');
-			}
+				const mark = document.createElement('mark');
+				// mark.classList.add('annotation-highlight');
+				mark.dataset.annotationId = annotation.id;
+				if (isMine) {
+					mark.classList.add('mine');
+				}
+				if (isActive) {
+					mark.classList.add('active');
+				}
 
-			Object.assign(mark.style, hashColor(annotation.user));
-			mark.onclick = event => {
-				//dispatch(annotationSelect(evt.target.dataset.annotationId));
-				console.log('clicked', event);
-			};
-			if (0 === index) first = mark;
-			return mark;
-		});
+				Object.assign(mark.style, hashColor(annotation.user));
+				mark.onclick = event => {
+					//dispatch(annotationSelect(evt.target.dataset.annotationId));
+					console.log('clicked', event);
+				};
+				if (0 === index) first = mark;
+				return mark;
+			},
+			/* Don’t create highlights as direct children of TR elements */
+			node => 'TR' === node.parentNode.nodeName.toUpperCase()
+		);
 		// The offset from the container
 		// return first.getBoundingClientRect().y - relativeY;
 	}
+
+	// const template = annotation => (node, index) => {};
 
 	onMount(() => {
 		return renderAnnotationHighlight(
