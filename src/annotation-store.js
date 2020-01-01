@@ -10,7 +10,7 @@ const items = writable([
 			start: { line: 1, column: 88 },
 			end: { line: 1, column: 95 }
 		},
-		active: false
+		isActive: false
 	},
 	{
 		id: 'ANN12345',
@@ -21,7 +21,7 @@ const items = writable([
 			start: { line: 3, column: 120 },
 			end: { line: 3, column: 500 }
 		},
-		active: false
+		isActive: false
 	},
 	{
 		id: 'ANN22222',
@@ -33,7 +33,7 @@ const items = writable([
 			start: { line: 5, column: 12 },
 			end: { line: 7, column: 67 }
 		},
-		active: true
+		isActive: false
 	},
 	{
 		id: 'ANN44444',
@@ -45,7 +45,7 @@ const items = writable([
 			start: { line: 25, column: 3 },
 			end: { line: 25, column: 8 }
 		},
-		active: true
+		isActive: false
 	}
 ]);
 
@@ -74,7 +74,17 @@ export const _annotations = {
 	},
 	delete: annotation =>
 		items.update(state => state.filter(item => annotation.id !== item.id)),
-	clear: () => items.update(state => [])
+	clear: () => items.update(state => []),
+	select: annotation =>
+		items.update(state =>
+			state.map(item => {
+				if (annotation.id === item.id) {
+					console.log('annotation-store.select', annotation);
+					return { ...item, isActive: true };
+				}
+				return { ...item, isActive: false };
+			})
+		)
 };
 
 function documentOrder(a, b) {
@@ -91,5 +101,6 @@ export const annotations = {
 	add: _annotations.add,
 	update: _annotations.update,
 	delete: _annotations.delete,
-	clear: _annotations.clear
+	clear: _annotations.clear,
+	select: _annotations.select
 };

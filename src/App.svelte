@@ -102,7 +102,13 @@ Humblebrag pok pok tacos hella hammock cold-pressed skateboard slow-carb. Fixie 
 		<Highlighter
 			on:selectionchange={event => console.log(event.detail)}
 			on:newannotation={handleNewAnnotation}>
-			<Markdown text={dummy} {annotations} />
+			<Markdown
+				text={dummy}
+				{annotations}
+				on:selectannotation={event => {
+					console.log(event.detail);
+					annotations.select(event.detail);
+				}} />
 		</Highlighter>
 	</section>
 	<section id="Annotations">

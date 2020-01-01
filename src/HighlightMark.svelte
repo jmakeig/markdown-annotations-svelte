@@ -1,5 +1,5 @@
 <script>
-	import { onMount, afterUpdate, onDestroy, getContext, tick } from 'svelte';
+	import { onMount, getContext, createEventDispatcher } from 'svelte';
 	import { highlightRange } from './highlight-range.js';
 
 	import { hashColor } from './user-store.js';
@@ -9,6 +9,8 @@
 
 	const user = getContext('user');
 	const parent = getContext('table');
+
+	const dispatch = createEventDispatcher();
 
 	/**
 	 *
@@ -114,8 +116,7 @@
 
 				Object.assign(mark.style, hashColor(annotation.user));
 				mark.onclick = event => {
-					//dispatch(annotationSelect(evt.target.dataset.annotationId));
-					console.log('clicked', event);
+					dispatch('selectannotation', annotation);
 				};
 				if (0 === index) first = mark;
 				return mark;
@@ -133,7 +134,15 @@
 		return renderAnnotationHighlight(
 			annotation,
 			annotation.user === $user.name,
-			false
+			false,
+			0,
+			dispatch
 		);
 	});
 </script>
+
+<style>
+	mark {
+		cursor: pointer;
+	}
+</style>

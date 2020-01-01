@@ -7,12 +7,6 @@ function clone(...rest) {
 const config = {
 	id: 'annotation',
 	initial: 'unselected',
-	context: {
-		id: null,
-		annotation: null,
-		errorMessage: null,
-		cache: null
-	},
 	states: {
 		unselected: {
 			on: {
@@ -26,28 +20,11 @@ const config = {
 		},
 		selected: {
 			id: 'selected',
-			initial: 'loading',
+			initial: 'viewing',
 			on: {
 				blur: { target: 'unselected' }
 			},
 			states: {
-				loading: {
-					invoke: {
-						id: 'fetchAnnotation',
-						src: 'fetchAnnotationService',
-						onDone: {
-							target: 'viewing',
-							actions: assign({ annotation: (context, event) => event.data })
-						},
-						onError: {
-							target: 'error',
-							actions: assign({
-								errorMessage: (context, event) => event.data
-							})
-						}
-					}
-				},
-				error: {},
 				viewing: {
 					on: {
 						edit: 'editing'
@@ -165,9 +142,8 @@ const machine = Machine(config, options);
 */
 
 export function AnnotationMachine(
-	fetchAnnotation,
-	confirmCancel,
-	saveAnnotation
+	annotation,
+	{ fetchAnnotation, confirmCancel, saveAnnotation }
 ) {
 	const options = {
 		actions: {
@@ -186,5 +162,11 @@ export function AnnotationMachine(
 				saveAnnotation(context.annotation)
 		}
 	};
-	return interpret(Machine(config, options));
+	const initialContext = {
+		id: null,
+		annotation,
+		errorMessage: null,
+		cache: null
+	};
+	return interpret(Machine(config, options).withContext(initialContext));
 }

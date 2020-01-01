@@ -58,5 +58,5 @@
 </table>
 
 {#each $annotations as annotation (annotation.id)}
-	<HighlightMark {annotation} isActive={false} />
+	<HighlightMark {annotation} isActive={false} on:selectannotation />
 {/each}

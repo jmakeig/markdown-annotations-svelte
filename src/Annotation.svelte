@@ -1,7 +1,7 @@
 <script>
 	import { debounce, count } from './util.js';
 	import { formatDate } from './i18n.js';
-	import { onMount, afterUpdate, tick } from 'svelte';
+	import { onMount, beforeUpdate, afterUpdate, tick } from 'svelte';
 	// import { flash } from './flash.js';
 	import { AnnotationMachine } from './annotation-existing-machine.js';
 	import User from './User.svelte';
@@ -9,18 +9,9 @@
 	const counter = count('Annotation');
 
 	export let instance;
-	$: ({ id, comment, user, timestamp, range } = instance);
+	$: ({ id, comment, user, timestamp, range, isActive } = instance);
 
 	export let services;
-
-	/**
-	 * Fake over-engineered Promise just in case I need to
-	 * retrieve this asynchronously in the future.
-	 */
-	function fetchAnnotation(id) {
-		//return Promise.reject('oops!');
-		return Promise.resolve(instance);
-	}
 
 	function confirmCancel(message = 'You sure?') {
 		return new Promise(function(resolve, reject) {
@@ -39,11 +30,10 @@
 
 	let machineState;
 
-	const annotationMachine = AnnotationMachine(
-		fetchAnnotation,
+	const annotationMachine = AnnotationMachine(instance, {
 		confirmCancel,
 		saveAnnotation
-	);
+	});
 
 	annotationMachine
 		.onTransition(state => {
@@ -57,10 +47,17 @@
 	onMount(() => () => annotationMachine.stop());
 
 	let me;
-	afterUpdate(() => {
-		// counter('afterUpdate');
-		// flash(me);
-	});
+	// afterUpdate(() => {
+	// counter('afterUpdate');
+	// flash(me);
+	// });
+
+	$: {
+		if (machineState.matches('unselected') && isActive) {
+			console.log({ id });
+			annotationMachine.send('select', { id });
+		}
+	}
 
 	function handleChange(initialValue, wait = 500) {
 		return debounce(
@@ -185,11 +182,14 @@
 	*/
 </style>
 
+<!-- {@debug machineState} -->
+
 <section
 	data-id={id}
 	bind:this={me}
 	class={machineState.matches('unselected') ? 'unselected' : 'selected'}>
 	{#if DEBUG}
+		<pre>{JSON.stringify(instance, null, 2)}</pre>
 		<pre>{JSON.stringify(machineState.value, null, 2)}</pre>
 		<pre>{JSON.stringify(machineState.context, null, 2)}</pre>
 	{/if}
