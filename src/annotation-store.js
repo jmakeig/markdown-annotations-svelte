@@ -79,7 +79,7 @@ export const _annotations = {
 		items.update(state =>
 			state.map(item => {
 				if (annotation.id === item.id) {
-					console.log('annotation-store.select', annotation);
+					// console.log('annotation-store.select', annotation);
 					return { ...item, isActive: true };
 				}
 				return { ...item, isActive: false };

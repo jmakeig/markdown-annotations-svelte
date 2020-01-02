@@ -4,7 +4,109 @@ function clone(...rest) {
 	return Object.assign({}, ...rest);
 }
 
+const confirming = (onConfirm, onCancel) => ({
+	confirming: {
+		invoke: {
+			src: 'confirmCancelService',
+			onDone: {
+				target: onConfirm,
+				actions: [
+					assign({
+						annotation: (context, event) => clone(context.cache)
+					}),
+					assign({ cache: (context, event) => null })
+				]
+			},
+			onError: { target: onCancel }
+		}
+	}
+});
+
+const cancel = (name, next) => ({
+	[name]: [
+		{
+			target: next,
+			cond: 'dirtyGuard'
+		},
+		{
+			target: 'confirming',
+			cond: 'needsConfirmation'
+		}
+	]
+});
+
 const config = {
+	strict: true,
+	id: 'annotation',
+	initial: 'unselected',
+	states: {
+		unselected: {
+			on: {
+				select: {
+					target: 'selected',
+					actions: assign({
+						id: (context, event) => event.id
+					})
+				}
+			}
+		},
+		selected: {
+			initial: 'viewing',
+			states: {
+				viewing: {
+					on: {
+						edit: 'editing'
+					}
+				},
+				editing: {
+					initial: 'clean',
+					on: {
+						...cancel('cancel', 'viewing')
+					},
+					states: {
+						clean: {
+							on: {
+								change: { target: 'dirty', actions: 'updateAnnotation' }
+							}
+						},
+						dirty: {
+							on: {
+								save: 'saving',
+								...cancel('revert', 'clean')
+							}
+						},
+						...confirming('clean', 'dirty'),
+						saving: {
+							invoke: {
+								id: 'saveAnnotation',
+								src: 'saveAnnotationService',
+								onDone: {
+									target: '#annotation.selected.viewing',
+									actions: assign({
+										annotation: (context, event) => event.data
+									})
+								},
+								onError: {
+									actions: assign({
+										errorMessage: (context, event) => event.data
+									})
+								}
+							}
+						}
+					}
+				},
+				...confirming('viewing', 'editing.dirty')
+			},
+			on: {
+				...cancel('blur', 'unselected')
+			}
+		},
+		...confirming('unselected', 'selected.editing.dirty')
+	}
+};
+
+/*
+const config1 = {
 	id: 'annotation',
 	initial: 'unselected',
 	states: {
@@ -102,6 +204,7 @@ const config = {
 		}
 	}
 };
+*/
 
 /*
 // For XState visualizer
@@ -160,8 +263,25 @@ export function AnnotationMachine(
 			confirmCancelService: (context, event) => confirmCancel(),
 			saveAnnotationService: (context, event) =>
 				saveAnnotation(context.annotation)
+		},
+		guards: {
+			dirtyGuard(c, e, m) {
+				return dirtyGuard(c, e, m);
+			},
+			needsConfirmation(c, e, m) {
+				return !dirtyGuard(c, e, m);
+			}
 		}
 	};
+
+	function dirtyGuard(context, event, meta) {
+		if (meta && meta.state) {
+			//console.log(m.state.value);
+			return meta.state.value.selected.editing !== 'dirty';
+		}
+		return true;
+	}
+
 	const initialContext = {
 		id: null,
 		annotation,

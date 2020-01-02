@@ -53,9 +53,10 @@
 	// });
 
 	$: {
-		if (machineState.matches('unselected') && isActive) {
-			console.log({ id });
+		if (isActive) {
 			annotationMachine.send('select', { id });
+		} else {
+			annotationMachine.send('blur', { id });
 		}
 	}
 

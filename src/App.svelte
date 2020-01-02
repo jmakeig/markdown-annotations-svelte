@@ -106,7 +106,6 @@ Humblebrag pok pok tacos hella hammock cold-pressed skateboard slow-carb. Fixie 
 				text={dummy}
 				{annotations}
 				on:selectannotation={event => {
-					console.log(event.detail);
 					annotations.select(event.detail);
 				}} />
 		</Highlighter>
