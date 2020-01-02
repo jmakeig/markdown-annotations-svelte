@@ -37,10 +37,8 @@
 
 	annotationMachine
 		.onTransition(state => {
-			// console.log(state);
-			// if (state.changed)
 			machineState = Object.assign({}, state);
-			console.log(state.value, state.context.annotation, state);
+			// console.log(state.value, state.context.annotation, state);
 		})
 		.start();
 

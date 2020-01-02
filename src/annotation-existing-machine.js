@@ -53,17 +53,26 @@ const config = {
 	initial: 'unselected',
 	states: {
 		unselected: {
+			entry: assign({
+				annotation: (context, event) => ({
+					...context.annotation,
+					isActive: false
+				})
+			}),
 			on: {
 				select: {
-					target: 'selected',
-					actions: assign({
-						id: (context, event) => event.id
-					})
+					target: 'selected'
 				}
 			}
 		},
 		selected: {
 			initial: 'viewing',
+			entry: assign({
+				annotation: (context, event) => ({
+					...context.annotation,
+					isActive: true
+				})
+			}),
 			states: {
 				viewing: {
 					on: {
