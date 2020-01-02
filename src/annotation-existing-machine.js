@@ -94,7 +94,12 @@ const config = {
 							on: {
 								save: 'saving',
 								...cancel('revert', 'clean')
-							}
+							},
+							actions: [
+								assign({
+									cache: (context, event) => clone(context.annotation)
+								})
+							]
 						},
 						...confirming('clean', 'dirty'),
 						saving: {
@@ -159,13 +164,13 @@ const options = {
 	services: {
 		confirmCancelService: (context, event) => confirmCancel(),
 		saveAnnotationService: (context, event) => Promise.resolve({}),
-		guards: {
-			dirtyGuard(c, e, m) {
-				return dirtyGuard(c, e, m);
-			},
-			needsConfirmation(c, e, m) {
-				return !dirtyGuard(c, e, m);
-			}
+	},
+	guards: {
+		dirtyGuard(c, e, m) {
+			return dirtyGuard(c, e, m);
+		},
+		needsConfirmation(c, e, m) {
+			return !dirtyGuard(c, e, m);
 		}
 	}
 };
