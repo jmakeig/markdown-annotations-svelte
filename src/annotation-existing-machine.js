@@ -4,6 +4,12 @@ function clone(...rest) {
 	return Object.assign({}, ...rest);
 }
 
+/**
+ * Builder for confirmation states.
+ *
+ * @param {String} onConfirm State to transition to on confirmation
+ * @param {String} onCancel State to transition to on cancel
+ */
 const confirming = (onConfirm, onCancel) => ({
 	confirming: {
 		invoke: {
@@ -22,6 +28,12 @@ const confirming = (onConfirm, onCancel) => ({
 	}
 });
 
+/**
+ * Builder for cancel transitions that guard against losing dirty data.
+ *
+ * @param {String} name The name of the current transition
+ * @param {String} next The state to transition to if no confirmation is needed
+ */
 const cancel = (name, next) => ({
 	[name]: [
 		{
@@ -105,143 +117,68 @@ const config = {
 	}
 };
 
-/*
-const config1 = {
-	id: 'annotation',
-	initial: 'unselected',
-	states: {
-		unselected: {
-			on: {
-				select: {
-					target: 'selected',
-					actions: assign({
-						id: (context, event) => event.id
-					})
-				}
-			}
-		},
-		selected: {
-			id: 'selected',
-			initial: 'viewing',
-			on: {
-				blur: { target: 'unselected' }
-			},
-			states: {
-				viewing: {
-					on: {
-						edit: 'editing'
-					}
-				},
-				editing: {
-					id: 'editing',
-					initial: 'clean',
-					entry: assign({ cache: (c, e) => clone(c.annotation) }),
-					states: {
-						clean: {
-							on: {
-								change: {
-									target: 'dirty',
-									actions: 'updateAnnotation'
-								},
-								cancel: '#annotation.selected.viewing'
-							}
-						},
-						dirty: {
-							id: 'dirty',
-							initial: 'changing',
-							on: {
-								save: 'saving',
-								blur: undefined
-							},
-							states: {
-								changing: {
-									on: {
-										cancel: 'confirming',
-										change: {
-											target: 'changing',
-											actions: 'updateAnnotation'
-										}
-									}
-								},
-								confirming: {
-									invoke: {
-										id: 'confirmCancel',
-										src: 'confirmCancelService',
-										onDone: {
-											target: '#annotation.selected.viewing',
-											actions: [
-												assign({
-													annotation: (context, event) => clone(context.cache)
-												}),
-												assign({ cache: (context, event) => null })
-											]
-										},
-										onError: { target: 'changing' }
-									}
-								}
-							}
-						},
-						saving: {
-							invoke: {
-								id: 'saveAnnotation',
-								src: 'saveAnnotationService',
-								onDone: {
-									target: '#annotation.selected.viewing',
-									actions: assign({
-										annotation: (context, event) => event.data
-									})
-								},
-								onError: {
-									actions: assign({
-										errorMessage: (context, event) => event.data
-									})
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+function dirtyGuard(context, event, meta) {
+	if (meta && meta.state) {
+		//console.log(m.state.value);
+		return meta.state.value.selected.editing !== 'dirty';
 	}
-};
-*/
-
+	return true;
+}
 /*
 // For XState visualizer
 
 function confirmCancel(message = 'You sure?') {
-  return new Promise(function(resolve, reject) {
-    if (window.confirm(message)) {
-      resolve();
-    } else {
-      reject();
-    }
-  });
+	return new Promise(function(resolve, reject) {
+		if (window.confirm(message)) {
+			resolve();
+		} else {
+			reject();
+		}
+	});
 }
 
 const options = {
-  actions: {
-    updateAnnotation: assign({
-      annotation: (context, event) =>
-        // This is an awkward way to update the `comment` property
-        Object.assign({}, context.annotation, {
-          comment: context.annotation.comment + 'X'
-        })
-    })
-  },
-  services: {
-    fetchAnnotationService: (context, event) =>
-      Promise.resolve({
-        id: 'ANN1234',
-        comment: 'Hi!',
-        timestamp: new Date().toISOString()
-      }),
-    confirmCancelService: (context, event) => confirmCancel(),
-    saveAnnotationService: (context, event) => Promise.resolve({})
-  }
+	actions: {
+		updateAnnotation: assign({
+			annotation: (context, event) =>
+				// This is an awkward way to update the `comment` property
+				Object.assign({}, context.annotation, {
+					comment: context.annotation.comment + 'X'
+				})
+		})
+	},
+	services: {
+		confirmCancelService: (context, event) => confirmCancel(),
+		saveAnnotationService: (context, event) => Promise.resolve({}),
+		guards: {
+			dirtyGuard(c, e, m) {
+				return dirtyGuard(c, e, m);
+			},
+			needsConfirmation(c, e, m) {
+				return !dirtyGuard(c, e, m);
+			}
+		}
+	}
+};
+const annotation = {
+	id: 'ANN12345',
+	user: 'jmakeig',
+	comment: 'Here is some text',
+	timestamp: '2019-12-16T22:14:28.872Z',
+	range: {
+		start: { line: 3, column: 120 },
+		end: { line: 3, column: 500 }
+	},
+	isActive: false
 };
 
-const machine = Machine(config, options);
+const initialContext = {
+	id: null,
+	annotation,
+	errorMessage: null,
+	cache: null
+};
+const machine = interpret(Machine(config, options).withContext(initialContext));
 */
 
 export function AnnotationMachine(
@@ -259,7 +196,6 @@ export function AnnotationMachine(
 			})
 		},
 		services: {
-			fetchAnnotationService: (context, event) => fetchAnnotation(context.id),
 			confirmCancelService: (context, event) => confirmCancel(),
 			saveAnnotationService: (context, event) =>
 				saveAnnotation(context.annotation)
@@ -273,14 +209,6 @@ export function AnnotationMachine(
 			}
 		}
 	};
-
-	function dirtyGuard(context, event, meta) {
-		if (meta && meta.state) {
-			//console.log(m.state.value);
-			return meta.state.value.selected.editing !== 'dirty';
-		}
-		return true;
-	}
 
 	const initialContext = {
 		id: null,
