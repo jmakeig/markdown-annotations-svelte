@@ -87,19 +87,21 @@ const config = {
 					states: {
 						clean: {
 							on: {
-								change: { target: 'dirty', actions: 'updateAnnotation' }
+								change: {
+									target: 'dirty',
+									actions: ['cache', 'updateAnnotation']
+								}
 							}
 						},
 						dirty: {
 							on: {
+								change: {
+									target: 'dirty',
+									actions: ['updateAnnotation']
+								},
 								save: 'saving',
 								...cancel('revert', 'clean')
-							},
-							actions: [
-								assign({
-									cache: (context, event) => clone(context.annotation)
-								})
-							]
+							}
 						},
 						...confirming('clean', 'dirty'),
 						saving: {
@@ -197,7 +199,7 @@ const machine = interpret(Machine(config, options).withContext(initialContext));
 
 export function AnnotationMachine(
 	annotation,
-	{ fetchAnnotation, confirmCancel, saveAnnotation }
+	{ confirmCancel, saveAnnotation }
 ) {
 	const options = {
 		actions: {
@@ -207,6 +209,10 @@ export function AnnotationMachine(
 					clone(context.annotation, {
 						comment: event.comment
 					})
+			}),
+			cache: assign({
+				cache: (context, event) =>
+					context.cache === null ? clone(context.annotation) : context.cache
 			})
 		},
 		services: {
