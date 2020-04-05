@@ -5,7 +5,7 @@
 	import { hashColor } from './user-store.js';
 
 	export let annotation;
-	export let isActive;
+	// export let isActive;
 
 	const user = getContext('user');
 	const parent = getContext('table');
