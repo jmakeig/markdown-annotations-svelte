@@ -40,6 +40,10 @@
 		line-height: 1.85;
 	}
 	:global(mark) {
+		position: relative;
+		padding: 0.5em 0;
+		left: 0;
+		right: 0;
 	}
 </style>
 

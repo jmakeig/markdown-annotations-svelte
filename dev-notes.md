@@ -1,3 +1,6 @@
+
+## Parent–Child Props
+
 Source: [https://objectcomputing.com/resources/publications/sett/july-2019-web-dev-simplified-with-svelte]
 Svelte can bind a child component prop to a variable in the parent component. This allows child components to change values of parent component variables.
 
@@ -27,3 +30,6 @@ And here is the child component:
 
 When the button in the Child component is pressed, cValue is doubled, and that becomes the new value of pValue because it is bound to cValue.
 
+## CSS Dark Mode
+
+https://css-tricks.com/dark-modes-with-css/
