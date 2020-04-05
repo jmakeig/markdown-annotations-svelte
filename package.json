@@ -7,20 +7,20 @@
 		"start": "sirv public"
 	},
 	"devDependencies": {
-		"@rollup/plugin-replace": "^2.3.0",
-		"rollup": "^1.29.0",
-		"rollup-plugin-commonjs": "^10.1.0",
-		"rollup-plugin-livereload": "^1.0.4",
-		"rollup-plugin-node-resolve": "^5.2.0",
-		"rollup-plugin-svelte": "^5.1.1",
-		"rollup-plugin-terser": "^5.2.0",
-		"svelte": "^3.16.7",
+		"@rollup/plugin-commonjs": "^11.0.2",
+		"@rollup/plugin-node-resolve": "^7.1.1",
+		"@rollup/plugin-replace": "^2.3.1",
+		"rollup": "^2.3.3",
+		"rollup-plugin-livereload": "^1.1.0",
+		"rollup-plugin-svelte": "^5.2.1",
+		"rollup-plugin-terser": "^5.3.0",
+		"svelte": "^3.20.1",
 		"zora": "^3.1.8"
 	},
 	"dependencies": {
 		"color-hash": "^1.0.3",
 		"sirv-cli": "^0.4.5",
-		"uuid": "^3.3.3",
-		"xstate": "^4.7.6"
+		"uuid": "^7.0.3",
+		"xstate": "^4.8.0"
 	}
 }

@@ -1,7 +1,7 @@
 import replace from '@rollup/plugin-replace';
 import svelte from 'rollup-plugin-svelte';
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 
@@ -27,7 +27,7 @@ export default {
 			dev: !production,
 			// we'll extract any component CSS out into
 			// a separate file — better for performance
-			css: css => {
+			css: (css) => {
 				css.write('public/build/bundle.css');
 			}
 		}),
@@ -39,7 +39,7 @@ export default {
 		// https://github.com/rollup/rollup-plugin-commonjs
 		resolve({
 			browser: true,
-			dedupe: importee =>
+			dedupe: (importee) =>
 				importee === 'svelte' || importee.startsWith('svelte/')
 		}),
 		commonjs(),
