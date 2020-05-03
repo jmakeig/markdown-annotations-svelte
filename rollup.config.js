@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import replace from '@rollup/plugin-replace';
 import svelte from 'rollup-plugin-svelte';
 import resolve from '@rollup/plugin-node-resolve';
@@ -50,7 +51,14 @@ export default {
 
 		// Watch the `public` directory and refresh the
 		// browser on changes when not in production
-		!production && livereload('public'),
+		!production &&
+			livereload({
+				watch: 'public',
+				https: {
+					key: fs.readFileSync('localhost-key.pem'),
+					cert: fs.readFileSync('localhost.pem')
+				}
+			}),
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify
