@@ -63,7 +63,8 @@
 		return debounce(
 			event =>
 				annotationMachine.send('change', { comment: event.target.value }),
-			wait
+			wait,
+			true
 		);
 	}
 
